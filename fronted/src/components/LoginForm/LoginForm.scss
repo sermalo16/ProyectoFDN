@@ -1,0 +1,47 @@
+@import "../../scss/index.scss";
+
+.login-form {
+    .ant-from-item:last-of-type {
+        margin: 0;
+    }
+
+    &-input {
+        .ant-input-prefix {
+            i {
+                font-size: 0em + 22px / $defaultFontSize;
+            }
+        }
+
+        input {
+            font-size: 0em +20px / $defaultFontSize  !important;
+            padding: 20px 20px 20px 40px !important;
+
+            &:focus {
+                border-color: $primary-color  !important;
+                box-shadow: none;
+            }
+        }
+    }
+
+    &-button {
+        width: 100%;
+        font-size: 0em + 22px / $defaultFontSize  !important;
+        background-color: $primary-color  !important;
+        color: $font-light  !important;
+        height: 42px !important;
+        margin-top: 20px !important;
+
+        &:hover {
+            background-color: $primary-color-hover  !important;
+            color: $font-light  !important;
+        }
+
+        &:focus,
+        &:active {
+            background-color: $primary-color  !important;
+            color: $font-light  !important;
+            border: 0 !important;
+        }
+    }
+
+}
