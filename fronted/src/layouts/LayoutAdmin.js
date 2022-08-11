@@ -14,7 +14,7 @@ export default function LayoutAdmin(props) {
   const {routes} = props;
   const [menuCollapsed, setMenuCollapsed] = useState(true);
   const { Header, Content, Footer} = Layout;
-  const user = "sergio";
+  const user = null;
   const isLoading= null;
 
   if(!user && !isLoading){
