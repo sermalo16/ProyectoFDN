@@ -16,13 +16,20 @@ function insertUser(req, res){
     let insert = "INSERT INTO users (useremail, username, create_date, password, active, user_description) VALUES (?,?,?,?,?,?)";
     let query = mysql.format(insert, [email, username, create_date, repeatPassword, active, user_description]);
 
-    connection.query(query, function(err, result){
+    connection.query(query, function(err, rows){
         if(err){
-            res.status(500).send({error: err })
+            res.status(500).send({error: err });
+            return;
         }else{
-            res.status(200).json(result);
+            if(!rows){
+                res.status(404).send({message: "error al crear el usuario"});
+                return;
+            }else{
+                res.status(200).send({message: req.body });
+                return;
+            }
         }
-    })
+    });
 
 }
 
