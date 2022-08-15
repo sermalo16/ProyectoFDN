@@ -1,8 +1,10 @@
 const express = require("express");
 const morgan = require('morgan');
-require("dotenv").config();
+const { API_VERISION, IP_SERVER } = require("./config");
 const app = express();
+require("dotenv").config();
 const port = process.env.PORT||5000;
+
 
 //middlewares
 app.use(morgan('dev'));
@@ -26,10 +28,12 @@ const routes = require("./src/routes/index");
 
 
 //Routes
-app.use('/api', routes);
+app.use(`/api/${API_VERISION}`, routes);
 
 //Starting server
-
 app.listen(port, () => {
-    console.log(`Servidor iniciado en el puerto: ${port}`);
+  console.log("########################");
+  console.log("####### API REST #######");
+  console.log("########################");
+  console.log(`http://${IP_SERVER}:${port}/api/${API_VERISION}/`);
 })

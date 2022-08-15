@@ -24,7 +24,7 @@ export function getRefreshTokenApi(){
 }
 
 export function refreshAccessTokenApi(refreshToken){
-    const url = `${basePath}/${apiVersion}/refresh-access-token`;
+    const url = `${basePath}/${apiVersion}/auth/refresh-access-token`;
 
     const bodyObj = {
         refreshToken: refreshToken,

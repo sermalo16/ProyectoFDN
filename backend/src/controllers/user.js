@@ -2,6 +2,7 @@ const {connection} = require("../database/config.db");
 const mysql = require('mysql');
 const moment = require("moment");
 const bcrypt = require('bcryptjs');
+const jwt = require('../service/jwt');
 
 function getUser(req, res){
     connection.query("SELECT * FROM users", (error, results) =>{
@@ -12,7 +13,7 @@ function getUser(req, res){
     });
 }
 
-function insertUser(req, res){
+function sign_up(req, res){
     const {email, username, password, repeatPassword, active, user_description} = req.body;
     const create_date = moment().format();
 
@@ -34,14 +35,12 @@ function insertUser(req, res){
                         let insert = "INSERT INTO users (useremail, username, create_date, password, active, user_description) VALUES (?,?,?,?,?,?)";
                         let query = mysql.format(insert, [email.toLowerCase(), username.toLowerCase(), create_date, hash, 1, user_description]);
                         connection.query(query, (err, result)=>{
-                            if(err){
+                            if(err.errno == 1062){
                                 res.status(500).send({message: "Usuario/Correo ya han sido registrados."});
+                            }else if(err.errno == -4078 || !err.errno){
+                                res.status(500).send({message: "Error al conectarse con la base de datos."});
                             }else{
-                                if(!result){
-                                    res.status(500).send({message: "Error al crear usuario."});
-                                }else{
-                                    res.status(200).send({message: "Usuario creado exitosamente.", body: result});
-                                }
+                                res.status(200).send({message: "Usuario creado con exito.", body: err});
                             }
                         });
                     }
@@ -61,7 +60,7 @@ function login(req, res){
         res.status(404).send({message: "Contraseña no ingresada."});
     }else{
         if(user.indexOf("@") > 0){
-            let select = "select useremail, password, active from users where useremail = ?"
+            let select = "select iduser, useremail, password, active, user_description from users where useremail = ?"
             let query = mysql.format(select, user);
             connection.query(query, async (error, results) =>{
                 if(error){
@@ -79,7 +78,10 @@ function login(req, res){
                                 }else if(!check){
                                     res.status(404).send({message: "la clave es incorrecta."})
                                 }else{
-                                    res.status(200).send({message: "todo bien."})
+                                    res.status(200).send({
+                                        accessToken: jwt.createAccessToken(results[0]),
+                                        refreshToken: jwt.createRefreshToken(results[0])
+                                    });
                                 }
                             });
                         }
@@ -87,7 +89,7 @@ function login(req, res){
                 }
             });
         }else{
-            let select = "select username, password, active from users where username = ?"
+            let select = "select iduser, username, password, active, user_description from users where username = ?"
             let query = mysql.format(select, user);
             connection.query(query, async (error, results) =>{
                 if(error){
@@ -105,7 +107,10 @@ function login(req, res){
                                 }else if(!check){
                                     res.status(404).send({message: "la clave es incorrecta."})
                                 }else{
-                                    res.status(200).send({message: "todo bien."})
+                                    res.status(200).send({
+                                        accessToken: jwt.createAccessToken(results[0]),
+                                        refreshToken: jwt.createRefreshToken(results[0])
+                                    });
                                 }
                             });
                         }
@@ -119,6 +124,6 @@ function login(req, res){
 
 module.exports = {
     getUser,
-    insertUser,
+    sign_up,
     login
 }

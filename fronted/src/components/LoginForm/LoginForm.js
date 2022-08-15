@@ -1,14 +1,14 @@
 import React, { useState} from 'react';
 import { Form, Input, Button, notification} from "antd";
 import {UserOutlined, LockOutlined} from "@ant-design/icons"
-//import { sigInApi } from "../../api/user";
+import { sigInApi } from "../../api/user";
 import { ACCESS_TOKEN, REFRESH_TOKEN} from "../../utils/constant";
 
 import "./LoginForm.scss";
 
 export default function LoginForm() {
     const [inputs, setInputs] = useState({
-        email: "",
+        user: "",
         password: ""
     });
 
@@ -21,9 +21,7 @@ export default function LoginForm() {
 
     
     const login = async e => {
-        e.preventDefault();
-
-        /*
+        
         const result = await sigInApi(inputs);
         if(result.message){
             notification["error"]({
@@ -39,19 +37,19 @@ export default function LoginForm() {
 
             window.location.href ="/admin";
         }
-        */
+        
     };
     
 
 
   return (
-    <Form className="login-form" onChange={ChangeForm} onSubmit={login}>
+    <Form className="login-form" onChange={ChangeForm} onFinish={login}>
         <Form.Item>
             <Input
             prefix={<UserOutlined style={{color: "rgba(0,0,0,.25)"}}/>}
-            type="email"
-            name="email"
-            placeholder="Correo electronico"
+            type="text"
+            name="user"
+            placeholder="Correo electronico/ Usuario"
             className="login-form-input"
             />
         </Form.Item>
@@ -68,5 +66,5 @@ export default function LoginForm() {
             <Button htmlType="submit" className="login-form-button">Entrar</Button>
         </Form.Item>
     </Form>
-  )
+  );
 }

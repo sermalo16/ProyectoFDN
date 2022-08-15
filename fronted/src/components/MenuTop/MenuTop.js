@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from "antd";
 import Smorel  from "../../assets/img/png/logo-white.png";
-import { MenuUnfoldOutlined, PoweroffOutlined ,MenuFoldOutlined} from "@ant-design/icons";
+import { MenuUnfoldOutlined, PoweroffOutlined ,MenuFoldOutlined, UserOutlined} from "@ant-design/icons";
 import { logout } from "../../api/auth";
 
 
@@ -9,7 +9,7 @@ import { logout } from "../../api/auth";
 import "./MenuTop.scss";
 
 export default function MenuTop(props) {
-    const { menuCollapsed, setMenuCollapsed} = props;
+    const { menuCollapsed, setMenuCollapsed, user} = props;
 
     const logoutUser = () => {
         logout();
@@ -26,9 +26,9 @@ export default function MenuTop(props) {
 
         <div className="menu-top-right">
             <Button type="link" onClick={logoutUser}>
-                <PoweroffOutlined />
+            {user} <PoweroffOutlined />
             </Button>
         </div>
     </div>
-  )
+  );
 }

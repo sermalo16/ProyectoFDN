@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const userRoutes = require("./user/userRoutes");
+const useAuth = require('./auth/auth');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -10,5 +11,6 @@ router.get('/', function(req, res, next) {
 
 //Rutas
 router.use('/users', userRoutes);
+router.use('/auth', useAuth);
 
 module.exports = router;
