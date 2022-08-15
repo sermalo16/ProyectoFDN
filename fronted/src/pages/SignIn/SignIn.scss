@@ -40,6 +40,10 @@
                 width: 100%;
             }
 
+            .ant-tabs-nav-wrap {
+                display: inline-block !important;
+            }
+
             .ant-tabs-tab {
                 width: 50%;
                 height: 60px !important;

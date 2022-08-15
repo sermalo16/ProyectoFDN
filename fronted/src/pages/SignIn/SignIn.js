@@ -36,6 +36,10 @@ export default function SignIn() {
               <RegisterForm/>
             </TabPane>
 
+            <TabPane tab={<span>Registrar Datos</span>} key="3">
+              <h1>Proximamente</h1>
+            </TabPane>
+
           </Tabs>
         </div>
       </Content>
