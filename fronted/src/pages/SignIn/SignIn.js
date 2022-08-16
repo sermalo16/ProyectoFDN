@@ -26,8 +26,9 @@ export default function SignIn() {
         </h1>
 
         <div className="sign-in-content-tabs">
+          
           <Tabs type="card">
-
+            
             <TabPane tab={<span>Entrar</span>} key="1">
               <LoginForm/>
             </TabPane>
@@ -39,8 +40,9 @@ export default function SignIn() {
             <TabPane tab={<span>Registrar Datos</span>} key="3">
               <h1>Proximamente</h1>
             </TabPane>
-
+            
           </Tabs>
+         
         </div>
       </Content>
     </Layout>

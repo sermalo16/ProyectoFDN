@@ -41,21 +41,6 @@ function refreshAccessToken(req, res){
     }
 }
 
-/*User.findOne({_id: id}, (err, userStored) => {
-    if(err){
-        res.status(500).send({message: "Error del servidor."});
-    }else {
-        if(!userStored) {
-            res.status(404).send({message: "Usuario no encontrado."});
-        }else{
-            res.status(200).send({
-                accessToken: jwt.createAccessToken(userStored),
-                refreshToken: refreshToken
-            })
-        }
-    }
-})*/
-
 module.exports = {
     refreshAccessToken
 }
