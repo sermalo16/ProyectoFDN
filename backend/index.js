@@ -1,5 +1,6 @@
 const express = require("express");
 const morgan = require('morgan');
+const path = require("path"); // <- importamos path
 const { API_VERISION, IP_SERVER } = require("./config");
 const app = express();
 require("dotenv").config();
@@ -22,6 +23,11 @@ app.use((req, res, next) => {
     res.header("Allow", "GET, POST, OPTIONS, PUT, DELETE");
     next();
   });
+
+
+// ✅ Sirve imágenes de empleados (http://localhost:3308/uploads/empleados/foto.jpg)
+app.use("/uploads", express.static(path.join(__dirname, "src", "uploads")));
+
 
 //cargamos el archivo de rutas
 const routes = require("./src/routes/index");

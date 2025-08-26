@@ -1,0 +1,102 @@
+/* Estructura general */
+.admin-layout {
+  min-height: 100vh;
+}
+
+/* Sider (menú lateral) */
+.admin-sider {
+  background: #001529;
+}
+
+/* Logo en la parte superior del menú lateral */
+.logo {
+  height: 64px;
+  color: white;
+  font-size: 20px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #002140;
+}
+
+/* Ícono de colapsar menú */
+.menu-toggle-icon {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: #fff;
+  cursor: pointer;
+}
+
+/* Menú lateral */
+.ant-menu-dark {
+  background: #001529;
+}
+
+/* Íconos del menú lateral */
+.ant-menu-item-icon {
+  font-size: 25px !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Encabezado */
+.admin-header {
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  border-bottom: 1px solid #f0f0f0;
+  height: 64px;
+}
+
+/* Contenido principal */
+.admin-content {
+  margin: 24px;
+  padding: 24px;
+  background: #fff;
+  min-height: 280px;
+}
+
+/* Encabezado izquierdo */
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Logo en el header (si usás una imagen) */
+.logo-img {
+  height: 32px;
+  width: auto;
+}
+
+/* Nombre de la empresa */
+.company-name {
+  font-weight: bold;
+  font-size: 18px;
+  color: #001529;
+}
+
+/* Encabezado derecho */
+.header-right {
+  display: flex;
+  align-items: center;
+}
+
+/* Íconos del encabezado */
+.header-right .header-icon {
+  font-size: 25px;
+  margin-left: 20px;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.header-right .header-icon:hover {
+  color: #1890ff;
+}
