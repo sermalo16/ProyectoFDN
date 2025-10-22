@@ -5,12 +5,13 @@ const employeeRoutes = require("./employee/employeeRoutes");
 const deparmentRoutes = require("./department/deparmentRoutes");
 const inventoryRoutes = require("./inventory/inventoryRoutes");
 const categoryRoutes = require("./inventory/categoryRoutes");
+const asigmentRoutes = require("./asigment/asigmentRoutes");
 const useAuth = require('./auth/auth');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
     //res.render('index', { title: 'Express' });
-    res.status(200).json({ 'version': '1.0', 'application': 'BTDGROUP' });
+    res.status(200).json({ 'version': '1.0', 'application': 'GRUPOFUNO' });
 });
 
 //Rutas
@@ -20,5 +21,6 @@ router.use("/department", deparmentRoutes);
 router.use('/auth', useAuth);
 router.use('/inventory', inventoryRoutes);
 router.use('/category', categoryRoutes);
+router.use('/asigment', asigmentRoutes);
 
 module.exports = router;

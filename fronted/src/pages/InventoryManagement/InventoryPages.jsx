@@ -11,19 +11,26 @@ import {
   Row,
   Col,
   Select,
+  Tabs
 } from "antd";
-import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import { PlusOutlined, EditOutlined, DeleteOutlined,   } from "@ant-design/icons";
 import {
   createInventory,
   updateInventory,
   deleteInventory,
   getInventory,
+  getInventoryByDepartment
 } from "../../services/Inventory";
 
 import { getCategories } from "../../services/categories";
 
+
+const { Option } = Select;
+const { TabPane } = Tabs;
+
 export default function InventoryPages() {
   const [inventory, setInventory] = useState([]);
+  const [inventoryAsignado, setinventoryAsignado] = useState([]);
   const [category, setCategory] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -48,6 +55,25 @@ export default function InventoryPages() {
     }
   };
 
+  const fetchInventoryByDepartment = async () => {
+    setLoading(true);
+    try {
+      // TODO: conectar con tu servicio real
+      const data = await getInventoryByDepartment();
+      setinventoryAsignado(data);
+    } catch (err) {
+      notification.error({
+        message: "Error",
+        description: "Error al cargar el inventario.",
+        placement: "bottomRight",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
+
   const fetchCategory = async () => {
     try {
       const data = await getCategories();
@@ -60,6 +86,7 @@ export default function InventoryPages() {
   useEffect(() => {
     fetchInventory();
     fetchCategory();
+    fetchInventoryByDepartment();
   }, []);
 
   const openModal = (item = null) => {
@@ -137,6 +164,7 @@ export default function InventoryPages() {
       key: "total_registros",
       width: 80,
       ellipsis: true,
+      
     },
     {
       title: "Datos del Activo",
@@ -144,6 +172,7 @@ export default function InventoryPages() {
       key: "nombre_activo",
       width: 200,
       ellipsis: true,
+      sorter: (a, b) => a.nombre_activo.localeCompare(b.nombre_activo),
     },
     {
       title: "Codigo de Auditoria",
@@ -151,6 +180,7 @@ export default function InventoryPages() {
       key: "codigo_auditoria",
       width: 200,
       ellipsis: true,
+      sorter: (a, b) => a.codigo_auditoria.localeCompare(b.codigo_auditoria),
     },
     {
       title: "Categoria",
@@ -158,6 +188,7 @@ export default function InventoryPages() {
       key: "categoria",
       width: 200,
       ellipsis: true,
+      sorter: (a, b) => a.categoria.localeCompare(b.categoria),
     },
     {
       title: "Service Tag",
@@ -165,6 +196,7 @@ export default function InventoryPages() {
       key: "service_tag",
       width: 200,
       ellipsis: true,
+      sorter: (a, b) => a.service_tag.localeCompare(b.service_tag),
     },
     {
       title: "Descripcion del activo",
@@ -179,6 +211,7 @@ export default function InventoryPages() {
       key: "marca",
       width: 200,
       ellipsis: true,
+      sorter: (a, b) => a.marca.localeCompare(b.marca),
     },
     {
       title: "Modelo",
@@ -186,6 +219,7 @@ export default function InventoryPages() {
       key: "modelo",
       width: 200,
       ellipsis: true,
+      sorter: (a, b) => a.modelo.localeCompare(b.modelo),
     },
     {
       title: "Serie",
@@ -193,6 +227,7 @@ export default function InventoryPages() {
       key: "serie",
       width: 200,
       ellipsis: true,
+      sorter: (a, b) => a.serie.localeCompare(b.serie),
     },
     {
       title: "Fecha de Adquisicion",
@@ -200,6 +235,7 @@ export default function InventoryPages() {
       key: "fecha_ingreso",
       width: 200,
       ellipsis: true,
+      sorter: (a, b) => new Date(a.fecha_ingreso) - new Date(b.fecha_ingreso)
     },
     {
       title: "valor del activo",
@@ -207,9 +243,12 @@ export default function InventoryPages() {
       key: "valor",
       width: 200,
       ellipsis: true,
+      sorter: (a, b) => a.valor - b.valor, // 🔢 orden numérico
+      render: (text) => `L. ${text}`,
     },
     {
       title: "Acciones",
+      key: "acciones",
       fixed: "right",
       render: (_, record) => (
         <Row gutter={[8, 8]}>
@@ -237,9 +276,21 @@ export default function InventoryPages() {
     },
   ];
 
+  const columnsAsignado = [
+  ...columns.filter((col) => col.key !== "acciones"), // quitamos la columna de acciones
+  {
+    title: "Departamento",
+    dataIndex: "departamento",
+    key: "departamento",
+    width: 200,
+    sorter: (a, b) => a.departamento.localeCompare(b.departamento),
+  },
+];
+
   return (
     <div>
       <h2>Gestión de Inventario</h2>
+
       <Button
         type="primary"
         icon={<PlusOutlined />}
@@ -249,15 +300,31 @@ export default function InventoryPages() {
         Agregar nuevo equipo
       </Button>
 
-      <Table
-        rowKey="idinventario"
-        columns={columns}
-        dataSource={inventory}
-        loading={loading}
-        scroll={{ x: "max-content", y: 400 }}
-        pagination={{ pageSize: 10 }}
-      />
+      {/* Pestañas de inventario */}
+      <Tabs defaultActiveKey="1">
+        <TabPane tab="Inventario en bodega de IT" key="1">
+          <Table
+            rowKey="idinventario"
+            columns={columns}
+            dataSource={inventory}
+            loading={loading}
+            scroll={{ x: "max-content", y: 400 }}
+            pagination={{ pageSize: 10 }}
+          />
+        </TabPane>
+        <TabPane tab="Inventario asignado" key="2">
+          <Table
+            rowKey="idinventario"
+            columns={columnsAsignado}
+            dataSource={inventoryAsignado}
+            loading={loading}
+            scroll={{ x: "max-content", y: 400 }}
+            pagination={{ pageSize: 10 }}
+          />
+        </TabPane>
+      </Tabs>
 
+      {/* Modal para agregar/editar equipos */}
       <Modal
         open={isModalOpen}
         title={editingInventory ? "Editar equipo" : "Agregar nuevo equipo"}
@@ -285,9 +352,7 @@ export default function InventoryPages() {
               <Form.Item
                 name="idcategoria"
                 label="Categoria"
-                rules={[
-                  { required: true, message: "Selecciona una categoria" },
-                ]}
+                rules={[{ required: true, message: "Selecciona una categoria" }]}
               >
                 <Select placeholder="Selecciona">
                   {category.map((d) => (
@@ -298,7 +363,6 @@ export default function InventoryPages() {
                 </Select>
               </Form.Item>
             </Col>
-
           </Row>
 
           <Row gutter={16}>
@@ -315,9 +379,7 @@ export default function InventoryPages() {
               <Form.Item
                 name="nombre_activo"
                 label="Nombre del activo"
-                rules={[
-                  { required: true, message: "Ingrese el nombre del activo" },
-                ]}
+                rules={[{ required: true, message: "Ingrese el nombre del activo" }]}
               >
                 <Input />
               </Form.Item>
@@ -359,9 +421,7 @@ export default function InventoryPages() {
               <Form.Item
                 name="valor"
                 label="Valor (Lempiras)"
-                rules={[
-                  { required: true, message: "Ingrese el valor del equipo" },
-                ]}
+                rules={[{ required: true, message: "Ingrese el valor del equipo" }]}
               >
                 <Input type="number" min={0} />
               </Form.Item>

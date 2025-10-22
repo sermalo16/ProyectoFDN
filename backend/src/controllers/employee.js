@@ -7,8 +7,8 @@ const path = require("path");
 
 function getEmployees(req, res) {
   const sql = `
-    SELECT 
-    COUNT(*) OVER () AS total_registros,
+    SELECT
+    ROW_NUMBER() OVER (ORDER BY e.idempleados) AS total_registros,
       e.idempleados,
       e.identidad,
       e.rrh_codigo,
@@ -21,7 +21,6 @@ function getEmployees(req, res) {
       e.fecha_ingreso,
       e.telefono,
       e.foto,
-      e.create_date,
       u.idusuarios,
       u.correo,
       u.descripcion,

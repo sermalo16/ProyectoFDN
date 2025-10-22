@@ -1,6 +1,6 @@
 const API_BASE = "http://localhost:3308/api/v1/inventory";
 
-// Obtener departamentos
+// Obtener Inventario
 export const getInventory = async () => {
   const res = await fetch(API_BASE + "/get-inventory");
 
@@ -12,7 +12,20 @@ export const getInventory = async () => {
   return await res.json();
 };
 
-// Crear departamento
+// Obtener Inventario
+export const getInventoryByDepartment = async () => {
+  const res = await fetch(API_BASE + "/get-inventory-by-deparment");
+
+  if (!res.ok) {
+    const errorBody = await res.json();
+    throw new Error(errorBody.message || "Error al obtener el inventario");
+  }
+
+  return await res.json();
+};
+
+
+// Crear Inventario
 export const createInventory = async (data) => {
   try {
     const res = await fetch(API_BASE + "/post-inventory", {
@@ -34,7 +47,7 @@ export const createInventory = async (data) => {
   }
 };
 
-// Actualizar departamento
+// Actualizar Inventario
 export const updateInventory = async (id, data) => {
   try {
     const res = await fetch(`${API_BASE + "/put-inventory"}/${id}`, {
@@ -56,7 +69,7 @@ export const updateInventory = async (id, data) => {
   }
 };
 
-// Eliminar departamento
+// Eliminar Inventario
 export const deleteInventory = async (id) => {
   try {
     const res = await fetch(`${API_BASE + "/delete-inventory"}/${id}`, {
