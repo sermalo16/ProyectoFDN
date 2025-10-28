@@ -19,8 +19,8 @@ import {
   deleteEmployee,
   getEmployees,
   updateEmployee,
-} from "../../services/employees";
-import { getDepartments } from "../../services/department";
+} from "../../../services/employees";
+import { getDepartments } from "../../../services/department";
 import moment from "moment";
 import {
   DeleteOutlined,
@@ -32,7 +32,7 @@ import {
 const { Option } = Select;
 const { TabPane } = Tabs;
 
-import defaultImage from "../../assets/empledo.png";
+import defaultImage from "../../../assets/empledo.png";
 
 const EmployeesPage = () => {
   const [employees, setEmployees] = useState([]);

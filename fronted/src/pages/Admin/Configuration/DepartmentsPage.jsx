@@ -9,45 +9,49 @@ import {
   Popconfirm,
   message,
   notification,
+  Row,
+  Col
 } from "antd";
 import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import {
-  getCategories,
-  createCategory,
-  updateCategory,
-  deleteCategory,
-} from "../../services/categories"; // Asegúrate de tener este archivo
+  getDepartments,
+  createDepartment,
+  updateDepartment,
+  deleteDepartment,
+} from "../../../services/department";
 
-export default function CategoryPage() {
-  const [categories, setCategories] = useState([]);
+
+export default function DepartmentsPage() {
+  const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [form] = Form.useForm();
-  const [editingCategory, setEditingCategory] = useState(null);
+  const [editingDepartment, setEditingDepartment] = useState(null);
 
-  const fetchCategories = async () => {
+  const fetchDepartments = async () => {
     setLoading(true);
     try {
-      const data = await getCategories();
-      setCategories(data);
+      const data = await getDepartments();
+      setDepartments(data);
     } catch (err) {
-      message.error("Error al cargar categorías");
+      message.error("Error al cargar departamentos");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchCategories();
+    fetchDepartments();
   }, []);
 
-  const openModal = (cat = null) => {
-    setEditingCategory(cat);
+  const openModal = (dep = null) => {
+    
+    setEditingDepartment(dep);
     setIsModalOpen(true);
     form.resetFields();
 
-    if (cat) {
-      form.setFieldsValue(cat);
+    if (dep) {
+      form.setFieldsValue(dep);
     }
   };
 
@@ -55,30 +59,34 @@ export default function CategoryPage() {
     try {
       const values = await form.validateFields();
 
-      if (editingCategory) {
-        const res = await updateCategory(editingCategory.idcategoria, values);
+      if (editingDepartment) {
+        const res = await updateDepartment(
+          editingDepartment.iddepartamentos,
+          values
+        );
         notification.success({
           message: "Actualizado",
-          description: res.message || "Categoría actualizada correctamente.",
+          description: res.message || "Departamento actualizado correctamente.",
           placement: "topRight",
           duration: 3,
         });
       } else {
-        const res = await createCategory(values);
+        const res = await createDepartment(values);
+        console.log(res);
         notification.success({
           message: "Creado",
-          description: res.message || "Categoría creada correctamente.",
+          description: res.message || "Departamento creado correctamente.",
           placement: "topRight",
           duration: 3,
         });
       }
 
       setIsModalOpen(false);
-      fetchCategories();
+      fetchDepartments();
     } catch (err) {
       notification.error({
         message: "Error",
-        description: err.message || "Error al guardar la categoría.",
+        description: err.message || "Error al guardar el departamento.",
         placement: "bottomRight",
       });
     }
@@ -86,18 +94,18 @@ export default function CategoryPage() {
 
   const handleDelete = async (id) => {
     try {
-      const res = await deleteCategory(id);
+      const res = await deleteDepartment(id);
       notification.success({
         message: "Eliminado",
-        description: res.message || "Categoría eliminada correctamente.",
+        description: res.message || "Departamento eliminado correctamente.",
         placement: "topRight",
         duration: 3,
       });
-      fetchCategories();
+      fetchDepartments();
     } catch (err) {
       notification.error({
         message: "Error",
-        description: err.message || "Error al eliminar la categoría.",
+        description: err.message || "Error al eliminar departamento.",
         placement: "topRight",
         duration: 3,
       });
@@ -105,8 +113,8 @@ export default function CategoryPage() {
   };
 
   const columns = [
-    { title: "ID", dataIndex: "idcategoria" },
-    { title: "Categoría", dataIndex: "categoria" },
+    { title: "ID", dataIndex: "iddepartamentos" },
+    { title: "Departamento", dataIndex: "departamento" },
     {
       title: "Acciones",
       render: (_, record) => (
@@ -114,7 +122,7 @@ export default function CategoryPage() {
           <Button icon={<EditOutlined />} onClick={() => openModal(record)} />
           <Popconfirm
             title="¿Seguro que deseas eliminar?"
-            onConfirm={() => handleDelete(record.idcategoria)}
+            onConfirm={() => handleDelete(record.iddepartamentos)}
           >
             <Button danger icon={<DeleteOutlined />} />
           </Popconfirm>
@@ -125,20 +133,20 @@ export default function CategoryPage() {
 
   return (
     <div>
-      <h2>Gestión de Categorías</h2>
+      <h2>Gestión de Departamentos</h2>
       <Button
         type="primary"
         icon={<PlusOutlined />}
         style={{ marginBottom: 16 }}
         onClick={() => openModal()}
       >
-        Crear nueva
+        Crear nuevo
       </Button>
 
       <Table
-        rowKey="idcategoria"
+        rowKey="iddepartamentos"
         columns={columns}
-        dataSource={categories}
+        dataSource={departments}
         loading={loading}
         scroll={{ x: "max-content", y: 400 }}
         pagination={{ pageSize: 10 }}
@@ -146,18 +154,20 @@ export default function CategoryPage() {
 
       <Modal
         open={isModalOpen}
-        title={editingCategory ? "Editar Categoría" : "Crear nueva Categoría"}
+        title={
+          editingDepartment ? "Editar Departamento" : "Crear nuevo Departamento"
+        }
         onCancel={() => setIsModalOpen(false)}
         onOk={handleOk}
-        okText={editingCategory ? "Actualizar" : "Crear"}
+        okText={editingDepartment ? "Actualizar" : "Crear"}
         destroyOnClose
       >
         <Form form={form} layout="vertical">
           <Form.Item
-            name="categoria"
-            label="Nombre de la categoría"
+            name="departamento"
+            label="Departamento"
             rules={[
-              { required: true, message: "Ingrese el nombre de la categoría" },
+              { required: true, message: "Ingrese el nombre del departamento" },
             ]}
           >
             <Input />

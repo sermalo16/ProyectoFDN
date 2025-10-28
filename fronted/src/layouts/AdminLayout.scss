@@ -1,0 +1,76 @@
+/* Estructura general */
+
+body, html {
+  overflow: auto;
+  height: 100%;
+}
+
+
+.admin-layout {
+  min-height: 100vh;
+}
+
+/* Sider fijo a la izquierda */
+.admin-sider {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  background: #001529;
+  z-index: 1000;
+}
+
+/* Ícono de colapsar menú */
+.menu-toggle-icon {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: #fff;
+  cursor: pointer;
+}
+
+/* Menú lateral */
+.ant-menu-dark {
+  background: #001529;
+}
+
+.ant-menu-item-icon {
+  font-size: 25px !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Header fijo arriba. OJO: el 'left' lo ponemos inline en el JSX */
+.admin-header {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 64px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  border-bottom: 1px solid #f0f0f0;
+  z-index: 1000;
+}
+
+/* Contenido: deja espacio para el header y se usa el scroll del navegador */
+.admin-content {
+  margin-top: 64px;       /* altura del header */
+  padding: 24px;
+  background: #fff;
+  min-height: calc(100vh - 64px);
+  overflow: visible; // Asegura que no se bloquee el scroll
+}
+
+/* Header left/right */
+.header-left { display: flex; align-items: center; gap: 12px; }
+.logo-img { height: 32px; width: auto; }
+.company-name { font-weight: bold; font-size: 18px; color: #001529; }
+.header-right { display: flex; align-items: center; }
+.header-right .header-icon { font-size: 25px; margin-left: 20px; cursor: pointer; transition: color 0.3s ease; }
+.header-right .header-icon:hover { color: #1890ff; }

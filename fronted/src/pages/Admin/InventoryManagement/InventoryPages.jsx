@@ -20,9 +20,9 @@ import {
   deleteInventory,
   getInventory,
   getInventoryByDepartment
-} from "../../services/Inventory";
+} from "../../../services/Inventory";
 
-import { getCategories } from "../../services/categories";
+import { getCategories } from "../../../services/categories";
 
 
 const { Option } = Select;

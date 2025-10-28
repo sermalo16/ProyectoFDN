@@ -25,9 +25,9 @@ import {
   DeleteOutlined,
   LaptopOutlined,
 } from "@ant-design/icons";
-import { getInventory } from "../../services/Inventory";
-import { getEmployees } from "../../services/Employees";
-import { getAsigment, createAsigment } from "../../services/asigment";
+import { getInventory } from "../../../services/Inventory";
+import { getEmployees } from "../../../services/Employees";
+import { getAsigment, createAsigment } from "../../../services/asigment";
 
 const { TabPane } = Tabs;
 const { Panel } = Collapse;
