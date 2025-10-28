@@ -22,5 +22,6 @@ router.use('/auth', useAuth);
 router.use('/inventory', inventoryRoutes);
 router.use('/category', categoryRoutes);
 router.use('/asigment', asigmentRoutes);
+router.use('/', useAuth);
 
 module.exports = router;

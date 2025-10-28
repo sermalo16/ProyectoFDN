@@ -22,7 +22,7 @@ function refreshAccessToken(req, res){
         res.status(404).send({message: "El refreshToken ha expirado"});
     }else {
         const {id} = jwt.decodedToken(refreshToken);
-        let insert = "select * from users where iduser = ?";
+        let insert = "select * from usuarios where idusuarios = ?";
         let query = mysql.format(insert, id);
         connection.query(query, (err, results) => {
             if(err){

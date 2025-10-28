@@ -8,7 +8,7 @@ import "./AdminLayout.scss";
 const { Content } = Layout;
 
 export default function AdminLayout() {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
 
   return (
     <Layout className="admin-layout">

@@ -7,7 +7,7 @@ exports.createAccessToken = function(user) {
     id: user.idusuarios,
     user: user.correo,
     description: user.descripcion,
-    tipo: user.tipo_usuarios,
+    tipo: user.tipo_usuario,
     createToken: moment().unix(),
     exp: moment().add(3, "hours").unix()
   };
