@@ -9,7 +9,8 @@ import NotFound from "../pages/ErrorPage/ErrorPage";
 //Paginas de Admin
 import AsigmentPage from "../pages/Admin/activities/AsigmentPage";
 import ManualsPage from "../pages/Admin/activities/ManualsPage";
-import TiketsPage from "../pages/Admin/activities/TiketPage";
+import TiketsPage from "../pages/Admin/activities/TiketPage/TiketPage";
+import CreateTiketPage from "../pages/Admin/activities/TiketPage/CreateTiketPage";
 import ConfigurationPage from "../pages/Admin/Configuration/ConfigurationPage";
 import DepartmentsPage from "../pages/Admin/Configuration/DepartmentsPage";
 import EmployeesPage from "../pages/Admin/Configuration/EmployeesPage";
@@ -37,6 +38,7 @@ const routes = [
       { path: "asigment", element: <AsigmentPage /> },
       { path: "manuals", element: <ManualsPage /> },
       { path: "tikets", element: <TiketsPage /> },
+      { path: "createTiket", element: <CreateTiketPage /> },
       { path: "configuration", element: <ConfigurationPage /> },
       { path: "departments", element: <DepartmentsPage /> },
       { path: "employees", element: <EmployeesPage /> },

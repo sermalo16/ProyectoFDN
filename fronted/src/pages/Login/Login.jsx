@@ -33,9 +33,12 @@ export default function Login() {
               onFinish={onFinish}
               layout="vertical"
               style={{ marginTop: 20 }}
+              autoComplete="on"
             >
               <Form.Item
+              id="user"
                 name="user"
+                autoComplete="user"
                 rules={[{ required: true, message: "Ingrese su correo" }]}
               >
                 <Input
@@ -45,7 +48,9 @@ export default function Login() {
               </Form.Item>
 
               <Form.Item
+              id="password"
                 name="password"
+                autoComplete="password"
                 rules={[{ required: true, message: "Ingresa tu clave!" }]}
               >
                 <Input.Password

@@ -1,0 +1,105 @@
+.create-ticket-page {
+  background-color: #f7f9fb;
+  min-height: 100vh;
+  padding: 30px;
+  color: #000;
+
+  .header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .left-header {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+
+      .back-button {
+        color: #000;
+        font-weight: 500;
+        background: #f0f0f0;
+        border-radius: 6px;
+        padding: 0 12px;
+        height: 36px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+
+        &:hover {
+          background: #e6e6e6;
+        }
+      }
+
+      .page-title {
+        color: #000;
+        margin: 0;
+      }
+    }
+
+    .right-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 500;
+
+      .select-trigger {
+        width: 220px;
+      }
+    }
+  }
+
+  .ticket-form {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 25px;
+    margin-top: 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+
+    .ant-form-item-label > label {
+      color: #000;
+      font-weight: 500;
+    }
+
+    input,
+    textarea,
+    .ant-select-selector {
+      background-color: #fafafa;
+      color: #000;
+    }
+  }
+
+  .section-title {
+    margin-top: 15px;
+    font-weight: 600;
+    color: #000;
+  }
+
+  .button-group {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+
+    button {
+      border-radius: 6px;
+      font-weight: 500;
+      height: 38px;
+    }
+  }
+
+  .template-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    .template-item {
+      padding: 10px 15px;
+      border: 1px solid #d9d9d9;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.2s;
+
+      &:hover {
+        background: #f0f0f0;
+      }
+    }
+  }
+}

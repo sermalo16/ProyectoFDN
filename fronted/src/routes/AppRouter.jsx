@@ -21,7 +21,8 @@ import NotFound from "../pages/ErrorPage/ErrorPage";
 //Paginas de Admin
 import AsigmentPage from "../pages/Admin/activities/AsigmentPage";
 import ManualsPage from "../pages/Admin/activities/ManualsPage";
-import TiketsPage from "../pages/Admin/activities/TiketPage";
+import TiketsPage from "../pages/Admin/activities/TiketPage/TiketPage";
+import CreateTiketPage from "../pages/Admin/activities/TiketPage/CreateTiketPage";
 import ConfigurationPage from "../pages/Admin/Configuration/ConfigurationPage";
 import DepartmentsPage from "../pages/Admin/Configuration/DepartmentsPage";
 import EmployeesPage from "../pages/Admin/Configuration/EmployeesPage";
@@ -99,6 +100,7 @@ export default function AppRouter() {
             <Route index element={<TiketsPage />} />
             <Route path="manuals" element={<ManualsPage />} />
             <Route path="tikets" element={<TiketsPage />} />
+            <Route path="createTiket" element={<CreateTiketPage />} />
             <Route path="asigment" element={<AsigmentPage />} />
             <Route path="configuration" element={<ConfigurationPage />} />
             <Route path="departments" element={<DepartmentsPage />} />
