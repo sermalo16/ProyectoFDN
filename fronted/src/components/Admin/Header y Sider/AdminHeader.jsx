@@ -2,7 +2,7 @@ import React from "react";
 import { Layout } from "antd";
 import { SearchOutlined, PlusCircleOutlined, SettingOutlined, UserOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
-import logoFuno from "../../assets/grupofuno.jpg";
+import logoFuno from "../../../assets/grupofuno.jpg";
 
 
 const { Header } = Layout;

@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Layout } from "antd";
 import { Outlet } from "react-router-dom";
-import AdminSider from "../components/Admin/Adminsider";
-import AdminHeader from "../components/Admin/AdminHeader";
+import AdminSider from "../components/Admin/Header y Sider/AdminSider";
+import AdminHeader from "../components/Admin/Header y Sider/AdminHeader";
 import "./AdminLayout.scss";
 
 const { Content } = Layout;
