@@ -15,6 +15,7 @@ $t-black: #000000;
   color: $t-black;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial;
 
+  /* === HEADER DE LA PÁGINA === */
   .tiket-header {
     display: flex;
     justify-content: space-between;
@@ -28,6 +29,7 @@ $t-black: #000000;
     }
   }
 
+  /* === TABLA === */
   .tiket-table {
     background: transparent;
 
@@ -50,6 +52,7 @@ $t-black: #000000;
       vertical-align: middle;
     }
 
+    /* === COLUMNA DE ASUNTO === */
     .subject-cell {
       display: flex;
       align-items: flex-start;
@@ -60,24 +63,42 @@ $t-black: #000000;
       }
 
       .subject-main {
+        display: flex;
+        flex-direction: column;
+
+        /* Título del ticket (clickeable) */
         .subject-title {
-          color: $t-black;
-          font-weight: 600;
+          margin-bottom: 4px;
+
+          .ticket-link {
+            color: #1677ff;
+            font-weight: 600;
+            text-decoration: none;
+            transition: color 0.2s ease, text-decoration 0.2s;
+
+            &:hover {
+              color: #0958d9;
+              text-decoration: underline;
+            }
+          }
         }
+
+        /* Metadatos del ticket */
         .subject-meta {
           color: $t-muted;
           font-size: 12px;
-          margin-top: 4px;
         }
       }
     }
 
+    /* === COLUMNA ESTADO === */
     .status-cell {
       .ant-tag {
         font-weight: 600;
       }
     }
 
+    /* === COLUMNA TÉCNICO === */
     .tech-cell {
       display: flex;
       align-items: center;
@@ -98,6 +119,7 @@ $t-black: #000000;
       }
     }
 
+    /* === COLUMNA ACCIONES === */
     .actions-cell {
       button {
         color: $t-muted;
@@ -108,11 +130,13 @@ $t-black: #000000;
     }
   }
 
+  /* Checkbox general */
   .select-all {
     margin-right: 8px;
     transform: scale(1.05);
   }
 
+  /* Responsivo */
   @media (max-width: 800px) {
     .tiket-header {
       flex-direction: column;

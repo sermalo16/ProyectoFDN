@@ -18,7 +18,7 @@ import {
   DownOutlined,
 } from "@ant-design/icons";
 import "./TiketPage.scss";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 const { Option } = Select;
 
@@ -89,7 +89,12 @@ export default function TiketPage() {
         <div className="subject-cell">
           <Tag color="orange">#{record.id}</Tag>
           <div className="subject-main">
-            <div className="subject-title">{text}</div>
+            {/* ✅ Ahora el título del ticket funciona como link */}
+            <div className="subject-title">
+              <Link to={`/admin/tickets/${record.id}`} className="ticket-link">
+                {text}
+              </Link>
+            </div>
             <div className="subject-meta">
               Por {record.requester} | En {record.date} | Estado de la aprobación: -
             </div>

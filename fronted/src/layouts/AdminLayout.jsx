@@ -8,20 +8,15 @@ import "./AdminLayout.scss";
 const { Content } = Layout;
 
 export default function AdminLayout() {
-  const [collapsed, setCollapsed] = useState(true);
+  const [collapsed, setCollapsed] = useState(true); // ✅ colapsado por defecto
+
   return (
     <Layout className="admin-layout">
       <AdminSider collapsed={collapsed} setCollapsed={setCollapsed} />
-      <Layout>
+      <Layout className="admin-main">
         <AdminHeader collapsed={collapsed} />
         <Content
-          className="admin-content"
-          style={{
-            marginLeft: collapsed ? 80 : 200,
-            padding: "24px",
-            minHeight: "calc(100vh - 64px)", // 64px = altura del Header
-            background: "#f0f2f5",
-          }}
+          className={`admin-content ${collapsed ? "collapsed" : "expanded"}`}
         >
           <Outlet />
         </Content>

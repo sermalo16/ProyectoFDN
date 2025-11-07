@@ -17,7 +17,7 @@ import { useNavigate } from "react-router-dom";
 const { Option } = Select;
 const { Title } = Typography;
 
-export default function SolicitudesVarias(props) {
+export default function SolicitudesVarias() {
   const [form] = Form.useForm();
   const navigate = useNavigate();
 

@@ -19,7 +19,8 @@ import Login from "../pages/Login/Login";
 import NotFound from "../pages/ErrorPage/ErrorPage";
 
 //Paginas de Admin
-import AsigmentPage from "../pages/Admin/activities/AsigmentPage";
+import AsigmentPage from "../pages/Admin/activities/Asigment/AsigmentPage";
+import CreateAsigment from "../pages/Admin/activities/Asigment/CreateAsigment";
 import ManualsPage from "../pages/Admin/activities/ManualsPage";
 import TiketsPage from "../pages/Admin/activities/TiketPage/TiketPage";
 import CreateTiketPage from "../pages/Admin/activities/TiketPage/CreateTiketPage";
@@ -102,6 +103,7 @@ export default function AppRouter() {
             <Route path="tikets" element={<TiketsPage />} />
             <Route path="createTiket" element={<CreateTiketPage />} />
             <Route path="asigment" element={<AsigmentPage />} />
+            <Route path="createAsigment" element={<CreateAsigment />} />
             <Route path="configuration" element={<ConfigurationPage />} />
             <Route path="departments" element={<DepartmentsPage />} />
             <Route path="employees" element={<EmployeesPage />} />

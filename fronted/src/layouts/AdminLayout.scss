@@ -1,76 +1,174 @@
-/* Estructura general */
-
-body, html {
-  overflow: auto;
+html,
+body {
   height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
 }
-
 
 .admin-layout {
-  min-height: 100vh;
+  height: 100vh;
+  display: flex;
 }
 
-/* Sider fijo a la izquierda */
+/* === SIDER === */
 .admin-sider {
   position: fixed;
   top: 0;
   left: 0;
   bottom: 0;
   background: #001529;
-  z-index: 1000;
-}
-
-/* Ícono de colapsar menú */
-.menu-toggle-icon {
-  height: 64px;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  color: #fff;
-  cursor: pointer;
+  flex-direction: column;
+  height: 100%;
+  width: 80px; /* ancho colapsado */
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 999;
+
+  &.expanded {
+    width: 200px;
+  }
+
+  /* BOTÓN ARRIBA */
+  .sider-footer {
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .collapse-btn {
+      font-size: 24px;
+      color: #fff;
+      transition: transform 0.3s ease;
+
+      &.rotated {
+        transform: rotate(180deg);
+      }
+    }
+  }
+
+  /* MENÚ */
+  .sider-menu-container {
+    flex: 1 1 auto; /* ocupa todo el espacio restante */
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+
+  /* Iconos grandes */
+  .ant-menu-item .ant-menu-item-icon {
+    font-size: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Animación del texto del menú */
+  .ant-menu-title-content {
+    opacity: 1;
+    transition: opacity 0.3s ease;
+  }
+
+  &.collapsed .ant-menu-title-content {
+    opacity: 0;
+  }
+
+  /* Botón Cerrar Sesión como item de menú */
+  .ant-menu-item[style*="margin-top: auto"] {
+    margin-top: auto;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+  }
+
+  /* Transición hover de todos los items */
+  .ant-menu-item {
+    display: flex;
+    align-items: center;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+  }
 }
 
-/* Menú lateral */
-.ant-menu-dark {
-  background: #001529;
-}
-
-.ant-menu-item-icon {
-  font-size: 25px !important;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Header fijo arriba. OJO: el 'left' lo ponemos inline en el JSX */
+/* === HEADER === */
 .admin-header {
   position: fixed;
   top: 0;
-  right: 0;
+  left: 80px;
   height: 64px;
+  width: calc(100% - 80px);
   background: #fff;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 24px;
   border-bottom: 1px solid #f0f0f0;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  padding: 0 16px;
   z-index: 1000;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &.expanded {
+    left: 200px;
+    width: calc(100% - 200px);
+  }
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    .logo-img {
+      height: 40px;
+      width: auto;
+      object-fit: contain;
+    }
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-right: 12px;
+
+    .header-icon {
+      font-size: 22px;
+      color: #444;
+      cursor: pointer;
+      transition: color 0.2s, transform 0.2s;
+
+      &:hover {
+        color: #1677ff;
+        transform: scale(1.1);
+      }
+    }
+  }
 }
 
-/* Contenido: deja espacio para el header y se usa el scroll del navegador */
+/* === CONTENIDO === */
 .admin-content {
-  margin-top: 64px;       /* altura del header */
+  position: absolute;
+  top: 64px;
+  bottom: 0;
+  background: #f0f2f5;
   padding: 24px;
-  background: #fff;
-  min-height: calc(100vh - 64px);
-  overflow: visible; // Asegura que no se bloquee el scroll
-}
+  overflow-y: auto;
+  transition: margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-left: 80px;
+  width: calc(100% - 80px);
 
-/* Header left/right */
-.header-left { display: flex; align-items: center; gap: 12px; }
-.logo-img { height: 32px; width: auto; }
-.company-name { font-weight: bold; font-size: 18px; color: #001529; }
-.header-right { display: flex; align-items: center; }
-.header-right .header-icon { font-size: 25px; margin-left: 20px; cursor: pointer; transition: color 0.3s ease; }
-.header-right .header-icon:hover { color: #1890ff; }
+  &.expanded {
+    margin-left: 200px;
+    width: calc(100% - 200px);
+  }
+}

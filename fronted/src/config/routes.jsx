@@ -7,7 +7,8 @@ import Login from "../pages/Login/Login";
 import NotFound from "../pages/ErrorPage/ErrorPage";
 
 //Paginas de Admin
-import AsigmentPage from "../pages/Admin/activities/AsigmentPage";
+import AsigmentPage from "../pages/Admin/activities/Asigment/AsigmentPage";
+import CreateAsigment from "../pages/Admin/activities/Asigment/CreateAsigment";
 import ManualsPage from "../pages/Admin/activities/ManualsPage";
 import TiketsPage from "../pages/Admin/activities/TiketPage/TiketPage";
 import CreateTiketPage from "../pages/Admin/activities/TiketPage/CreateTiketPage";
@@ -36,6 +37,7 @@ const routes = [
     element: <AdminLayout />,
     children: [
       { path: "asigment", element: <AsigmentPage /> },
+      {path: "createAsigment", element: <CreateAsigment /> },
       { path: "manuals", element: <ManualsPage /> },
       { path: "tikets", element: <TiketsPage /> },
       { path: "createTiket", element: <CreateTiketPage /> },
