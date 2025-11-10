@@ -31,6 +31,7 @@ import ProfilesPage from "../pages/Admin/profile/ProfilePage";
 import CategoryPages from "../pages/Admin/InventoryManagement/CategoryPages";
 import InventoryPages from "../pages/Admin/InventoryManagement/InventoryPages";
 import CompanyPage from "../pages/Admin/Company/CompanyPage";
+import CreateCompanyPage from "../pages/Admin/Company/CreateCompanyPage";
 
 function SessionWatcher() {
   const { logout } = useAuth();
@@ -111,6 +112,7 @@ export default function AppRouter() {
             <Route path="category" element={<CategoryPages />} />
             <Route path="inventory" element={<InventoryPages />} />
             <Route path="company" element={<CompanyPage />} />
+            <Route path="createCompany" element={<CreateCompanyPage />} />
           </Route>
         </Route>
 

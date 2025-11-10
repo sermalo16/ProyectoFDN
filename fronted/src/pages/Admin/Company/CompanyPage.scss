@@ -1,0 +1,24 @@
+.company-page {
+  min-height: 100vh;
+  padding: 24px;
+  background: #f9f9f9;
+  display: flex;
+  flex-direction: column;
+
+  .header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+
+    .page-title {
+      margin: 0;
+    }
+  }
+
+  .ant-table {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+}

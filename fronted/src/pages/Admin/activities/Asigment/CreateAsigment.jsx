@@ -46,6 +46,7 @@ export default function CreateAsigment() {
     { title: "Tipo", dataIndex: "tipo", key: "tipo" },
     { title: "Marca", dataIndex: "marca", key: "marca" },
     { title: "Modelo", dataIndex: "modelo", key: "modelo" },
+    { title: "Valor", dataIndex: "Valor", key: "Valor" },
     {
       title: "Acciones",
       key: "acciones",
@@ -64,6 +65,7 @@ export default function CreateAsigment() {
   const columnsAccesorios = [
     { title: "Accesorio", dataIndex: "accesorio", key: "accesorio" },
     { title: "Cantidad", dataIndex: "cantidad", key: "cantidad" },
+    { title: "Valor", dataIndex: "Valor", key: "Valor" },
     {
       title: "Acciones",
       key: "acciones",

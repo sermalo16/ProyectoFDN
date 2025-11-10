@@ -19,6 +19,7 @@ import ProfilesPage from "../pages/Admin/profile/ProfilePage";
 import CategoryPages from "../pages/Admin/InventoryManagement/CategoryPages";
 import InventoryPages from "../pages/Admin/InventoryManagement/InventoryPages";
 import CompanyPage from "../pages/Admin/Company/CompanyPage";
+import CreateCompanyPage from "../pages/Admin/Company/CreateCompanyPage";
 
 const routes = [
   // ✅ Ruta raíz y login
@@ -48,6 +49,7 @@ const routes = [
       { path: "category", element: <CategoryPages /> },
       { path: "inventory", element: <InventoryPages /> },
       { path: "company", element: <CompanyPage /> },
+      { path: "createCompany", element: <CreateCompanyPage /> },
       // Página no encontrada dentro del admin
       { path: "*", element: <NotFound /> },
     ],
