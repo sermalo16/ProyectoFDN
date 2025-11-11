@@ -38,7 +38,7 @@ const ConfigurationPage = () => {
             </Title>
             <div>
               <Link to="/admin/employees">Empleados</Link> | {" "}
-              <Link to="/admin/employees">Permisos</Link>
+              <Link to="/admin/access">Permisos</Link>
             </div>
           </Card>
         </Col>

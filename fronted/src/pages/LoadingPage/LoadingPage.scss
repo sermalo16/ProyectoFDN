@@ -1,0 +1,22 @@
+.loading-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: linear-gradient(135deg, #f0f2f5 0%, #ffffff 100%);
+}
+
+.loading-content {
+  text-align: center;
+  background: #fff;
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.progress-container {
+  margin-top: 24px;
+  .ant-progress-bg {
+    background: linear-gradient(90deg, #1890ff, #40a9ff, #69c0ff);
+  }
+}

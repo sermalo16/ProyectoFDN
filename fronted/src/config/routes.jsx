@@ -15,6 +15,7 @@ import CreateTiketPage from "../pages/Admin/activities/TiketPage/CreateTiketPage
 import ConfigurationPage from "../pages/Admin/Configuration/ConfigurationPage";
 import DepartmentsPage from "../pages/Admin/Configuration/DepartmentsPage";
 import EmployeesPage from "../pages/Admin/Configuration/EmployeesPage";
+import AccessPage from "../pages/Admin/Configuration/AccessPage";
 import ProfilesPage from "../pages/Admin/profile/ProfilePage";
 import CategoryPages from "../pages/Admin/InventoryManagement/CategoryPages";
 import InventoryPages from "../pages/Admin/InventoryManagement/InventoryPages";
@@ -45,6 +46,7 @@ const routes = [
       { path: "configuration", element: <ConfigurationPage /> },
       { path: "departments", element: <DepartmentsPage /> },
       { path: "employees", element: <EmployeesPage /> },
+      { path: "access", element: <AccessPage /> },
       { path: "profile", element: <ProfilesPage /> },
       { path: "category", element: <CategoryPages /> },
       { path: "inventory", element: <InventoryPages /> },

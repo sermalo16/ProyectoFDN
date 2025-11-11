@@ -27,11 +27,14 @@ import CreateTiketPage from "../pages/Admin/activities/TiketPage/CreateTiketPage
 import ConfigurationPage from "../pages/Admin/Configuration/ConfigurationPage";
 import DepartmentsPage from "../pages/Admin/Configuration/DepartmentsPage";
 import EmployeesPage from "../pages/Admin/Configuration/EmployeesPage";
+import AccessPage from "../pages/Admin/Configuration/AccessPage";
 import ProfilesPage from "../pages/Admin/profile/ProfilePage";
 import CategoryPages from "../pages/Admin/InventoryManagement/CategoryPages";
 import InventoryPages from "../pages/Admin/InventoryManagement/InventoryPages";
 import CompanyPage from "../pages/Admin/Company/CompanyPage";
 import CreateCompanyPage from "../pages/Admin/Company/CreateCompanyPage";
+
+import LoadingPage from "../pages/LoadingPAge/LoadingPage";
 
 function SessionWatcher() {
   const { logout } = useAuth();
@@ -53,7 +56,7 @@ function SessionWatcher() {
 export default function AppRouter() {
   const { user, isLoading } = useAuth();
 
-  if (isLoading) return <p>Cargando sesión...</p>;
+  if (isLoading) return <LoadingPage message="Verificando sesión del usuario..." />;
 
   return (
     <BrowserRouter>
@@ -108,6 +111,7 @@ export default function AppRouter() {
             <Route path="configuration" element={<ConfigurationPage />} />
             <Route path="departments" element={<DepartmentsPage />} />
             <Route path="employees" element={<EmployeesPage />} />
+            <Route path="access" element={<AccessPage />} />
             <Route path="profile" element={<ProfilesPage />} />
             <Route path="category" element={<CategoryPages />} />
             <Route path="inventory" element={<InventoryPages />} />
