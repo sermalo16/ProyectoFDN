@@ -35,7 +35,6 @@ import CompanyPage from "../pages/Admin/Company/CompanyPage";
 import CreateCompanyPage from "../pages/Admin/Company/CreateCompanyPage";
 
 import LoadingPage from "../pages/LoadingPAge/LoadingPage";
-
 function SessionWatcher() {
   const { logout } = useAuth();
   const location = useLocation();
