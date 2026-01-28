@@ -9,11 +9,6 @@ router.post("/post-employee", upload.single("foto"), employeeController.createEm
 // Obtener empleados
 router.get("/get-employee", employeeController.getEmployees);
 
-// Obtener empleados Tecnicos
-router.get("/get-employee/technicians", employeeController.getTechnicians);
-
-// Obtener empleados Solicitante
-router.get("/get-employee/applicants", employeeController.getapplicants);
 
 //Actualizar
 router.put("/put-employee/:idusuarios", upload.single("foto"), employeeController.updateEmployee);

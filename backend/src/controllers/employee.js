@@ -5,6 +5,257 @@ const bcrypt = require("bcryptjs");
 const fs = require("fs");
 const path = require("path");
 
+//obtener empleados
+function getEmployees(req, res) {
+  const sql = `
+    SELECT 
+      e.*,
+      d.departamento,
+      em.nombreEmpresa AS empresa
+    FROM empleados e
+    INNER JOIN empresa_departamento ed 
+      ON e.id_empresa_departamento = id
+    INNER JOIN departamentos d 
+      ON ed.id_departamento = d.iddepartamentos
+    INNER JOIN empresas em 
+      ON ed.id_empresa = em.idEmpresa
+  `;
+
+  connection.query(sql, (err, results) => {
+    if (err) return res.status(500).json({ message: "Error al obtener empleados" });
+
+    const baseUrl = `${req.protocol}://${req.get("host")}`;
+
+    const data = results.map(e => ({
+      ...e,
+      foto: e.foto
+        ? `${baseUrl}/uploads/empleados/${e.foto}`
+        : null
+    }));
+
+    res.json(data);
+  });
+}
+
+
+//obtener empleados por ID
+function getEmployeeById(req, res) {
+  const { id } = req.params;
+
+  const sql = `
+    SELECT *
+    FROM empleados
+    WHERE idempleados = ?
+  `;
+
+  connection.query(sql, [id], (err, results) => {
+    if (err) return res.status(500).json({ message: "Error", err });
+    if (results.length === 0) {
+      return res.status(404).json({ message: "Empleado no encontrado" });
+    }
+    res.json(results[0]);
+  });
+}
+
+//crear empleado
+function createEmployee(req, res) {
+  const {
+    id_empresa_departamento,
+    identidad,
+    nombre,
+    apellido,
+    puesto,
+    fecha_nacimiento,
+    fecha_ingreso,
+    telefono,
+    rrh_codigo,
+    correo,
+    clave,
+    roles
+  } = req.body;
+
+  const foto = req.file ? req.file.filename : null;
+
+  if (!correo || !clave || !id_empresa_departamento) {
+    return res.status(400).json({ message: "Campos obligatorios faltantes" });
+  }
+
+  bcrypt.hash(clave, 10, (err, hash) => {
+    if (err) return res.status(500).json({ message: "Error encriptando clave" });
+
+    const sql = `
+  INSERT INTO empleados (
+    id_empresa_departamento,
+    identidad,
+    nombre,
+    apellido,
+    puesto,
+    fecha_nacimiento,
+    fecha_ingreso,
+    foto,
+    telefono,
+    rrh_codigo,
+    correo,
+    clave,
+    roles,
+    estado
+  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
+`;
+
+
+    const values = [
+  id_empresa_departamento,
+  identidad,
+  nombre,
+  apellido,
+  puesto,
+  fecha_nacimiento,
+  fecha_ingreso,
+  foto,
+  telefono,
+  rrh_codigo,
+  correo.toLowerCase(),
+  hash,
+  roles
+];
+
+    connection.query(sql, values, (err, result) => {
+      if (err) {
+        if (err.errno === 1062) {
+          return res.status(409).json({ message: "Correo ya registrado" });
+        }
+        return res.status(500).json({ message: "Error al crear empleado", err });
+      }
+
+      res.status(201).json({
+        message: "Empleado creado exitosamente",
+        id: result.insertId
+      });
+    });
+  });
+}
+
+
+//actualizar empleado
+function updateEmployee(req, res) {
+  const { id } = req.params;
+  const {
+    identidad,
+    nombre,
+    apellido,
+    puesto,
+    telefono,
+    roles,
+    estado
+  } = req.body;
+
+  const foto = req.file ? req.file.filename : null;
+
+  let sql = `
+    UPDATE empleados SET
+      identidad = ?,
+      nombre = ?,
+      apellido = ?,
+      puesto = ?,
+      telefono = ?,
+      roles = ?,
+      estado = ?
+  `;
+
+  const values = [
+    identidad,
+    nombre,
+    apellido,
+    puesto,
+    telefono,
+    roles,
+    estado
+  ];
+
+  if (foto) {
+    sql += `, foto = ?`;
+    values.push(foto);
+  }
+
+  sql += ` WHERE idempleados = ?`;
+  values.push(id);
+
+  connection.query(sql, values, err => {
+    if (err) return res.status(500).json({ message: "Error actualizando empleado" });
+    res.json({ message: "Empleado actualizado correctamente" });
+  });
+}
+
+
+//eliminar empleado
+function deleteEmployee(req, res) {
+  const { id } = req.params;
+
+  connection.query(
+    "DELETE FROM empleados WHERE idempleados = ?",
+    [id],
+    err => {
+      if (err) return res.status(500).json({ message: "Error al eliminar" });
+      res.json({ message: "Empleado eliminado" });
+    }
+  );
+}
+
+
+//login
+//inicio de sesion
+function login(req, res) {
+  const { correo, clave } = req.body;
+
+  const sql = `
+    SELECT *
+    FROM empleados
+    WHERE correo = ?
+  `;
+
+  connection.query(sql, [correo], (err, results) => {
+    if (err) return res.status(500).json({ message: "Error servidor" });
+    if (results.length === 0) {
+      return res.status(404).json({ message: "Correo no existe" });
+    }
+
+    const empleado = results[0];
+
+    if (!empleado.estado) {
+      return res.status(403).json({ message: "Usuario inactivo" });
+    }
+
+    bcrypt.compare(clave, empleado.clave, (err, match) => {
+      if (!match) {
+        return res.status(401).json({ message: "Contraseña incorrecta" });
+      }
+
+      res.json({
+        token: jwt.createAccessToken(empleado),
+        empleado: {
+          id: empleado.idempleados,
+          nombre: empleado.nombre,
+          roles: empleado.roles
+        }
+      });
+    });
+  });
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
 function getEmployees(req, res) {
   const sql = `
     SELECT
@@ -423,243 +674,13 @@ function getapplicants(req,res){
     res.status(200).json(empleadosFormateados);
   });
 }
-
-
-/*
-// Crear un nuevo empleado
-function createEmployee(req, res) {
-  
-  const {
-    identidad,
-    rrh_codigo,
-    nombre,
-    apellido,
-    puesto,
-    fecha_nacimiento,
-    iddepartamento,
-    fecha_ingreso,
-    telefono,
-    
-  } = req.body;
-
-  
-
-  // Validaciones básicas
-  if (!identidad || !rrh_codigo || !nombre || !apellido || !puesto || !fecha_nacimiento || !fecha_ingreso || !telefono || !iddepartamento) {
-    return res.status(400).send({ message: "Todos los campos son obligatorios." });
-  }
-
-  const create_date = moment().format();
-  const foto = req.file ? req.file.filename : null; // Si usás multer
-
-  let insert = `
-    INSERT INTO empleados (identidad, rrh_codigo, nombre, apellido, puesto, 
-    fecha_nacimiento, iddepartamento, fecha_ingreso, foto, telefono, create_date) 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `;
-
-  let values = [
-    identidad,
-    rrh_codigo,
-    nombre,
-    apellido,
-    puesto,
-    moment(fecha_nacimiento).format("YYYY-MM-DD"),
-    iddepartamento,
-    moment(fecha_ingreso).format("YYYY-MM-DD"),
-    foto,
-    telefono,
-    create_date
-  ];
-
-  let query = mysql.format(insert, values);
-
-  connection.query(query, (err, result) => {
-    if (err) {
-      if (err.errno === 1062) {
-        return res.status(409).send({ message: "El empleado ya existe (DNI o código RRHH duplicado)." });
-      } else if (err.errno === -4078 || !err.errno) {
-        
-        return res.status(500).send({ message: "Error al conectarse con la base de datos." });
-      } else {
-        console.log(err)
-        return res.status(500).send({ message: "Error desconocido.", error: err });
-      }
-    }
-
-    res.status(201).send({ message: "El Empleado fue creado con exito.", result });
-  });
-}
-
-// Obtener todos los empleados
-function getEmployees(req, res) {
-  const sql = `
-    SELECT 
-      e.idempleados,
-      e.identidad,
-      e.rrh_codigo,
-      e.nombre,
-      e.apellido,
-      e.puesto,
-      e.fecha_nacimiento,
-      e.fecha_ingreso,
-      e.telefono,
-      e.foto,
-      d.iddepartamentos,
-      d.departamento,
-      e.create_date
-    FROM empleados e
-    LEFT JOIN departamentos d ON e.iddepartamento = d.iddepartamentos
-    ORDER BY e.idempleados ASC
-  `;
-
-  connection.query(sql, (err, results) => {
-    if (err) {
-      return res.status(500).send({ message: "Error al obtener los empleados.", error: err });
-    }
-
-    const baseUrl = req.protocol + "://" + req.get("host"); // ej: http://localhost:3308
-
-    const empleadosFormateados = results.map(emp => ({
-      ...emp,
-      fecha_nacimiento: moment(emp.fecha_nacimiento).format("YYYY-MM-DD"),
-      fecha_ingreso: moment(emp.fecha_ingreso).format("YYYY-MM-DD"),
-      create_date: moment(emp.create_date).format("YYYY-MM-DD"),
-      foto: emp.foto ? `${baseUrl}/uploads/empleados/${emp.foto}` : null
-    }));
-
-    res.status(200).json(empleadosFormateados);
-  });
-}
-
-//actualizar Empleados
-function updateEmployee(req, res) {
-  const { idempleados } = req.params;
-
-  const {
-    identidad,
-    rrh_codigo,
-    nombre,
-    apellido,
-    puesto,
-    fecha_nacimiento,
-    iddepartamento,
-    fecha_ingreso,
-    telefono
-  } = req.body;
-
-  const foto = req.file ? req.file.filename : null;
-
-  // Validaciones básicas
-  if (!identidad || !rrh_codigo || !nombre || !apellido || !puesto || !fecha_nacimiento || !fecha_ingreso || !telefono || !iddepartamento) {
-    console.log(req.body);
-    return res.status(400).send({ message: "Todos los campos son obligatorios para actualizar." });
-  }
-
-  const sql = `
-    UPDATE empleados SET
-      identidad = ?,
-      rrh_codigo = ?,
-      nombre = ?,
-      apellido = ?,
-      puesto = ?,
-      fecha_nacimiento = ?,
-      iddepartamento = ?,
-      fecha_ingreso = ?,
-      telefono = ?,
-      ${foto ? "foto = ?" : ""}
-    WHERE idempleados = ?
-  `;
-
-  const formattedFechaNacimiento = moment(fecha_nacimiento).format("YYYY-MM-DD");
-  const formattedFechaIngreso = moment(fecha_ingreso).format("YYYY-MM-DD");
-
-  const values = [
-    identidad,
-    rrh_codigo,
-    nombre,
-    apellido,
-    puesto,
-    formattedFechaNacimiento,
-    iddepartamento,
-    formattedFechaIngreso,
-    telefono,
-    ...(foto ? [foto] : []),
-    idempleados
-  ];
-
-  const query = mysql.format(sql, values);
-
-  connection.query(query, (err, result) => {
-    if (err) {
-      console.log("Error al actualizar empleado:", err);
-      return res.status(500).send({ message: "Error al actualizar el empleado.", error: err });
-    }
-
-    if (result.affectedRows === 0) {
-      return res.status(404).send({ message: "Empleado no encontrado." });
-    }
-
-    res.status(200).send({ message: "Empleado actualizado con éxito." });
-  });
-}
-
-
-//eliminar Empleados
-function deleteEmployee(req, res) {
-  const { idempleados } = req.params;
-
-  // 1. Buscar la foto del empleado
-  const sqlGet = "SELECT foto FROM empleados WHERE idempleados = ?";
-  const queryGet = mysql.format(sqlGet, [idempleados]);
-
-  connection.query(queryGet, (err, result) => {
-    if (err) {
-      console.error("Error al buscar empleado:", err);
-      return res.status(500).send({ message: "Error al buscar el empleado.", error: err });
-    }
-
-    if (result.length === 0) {
-      return res.status(404).send({ message: "Empleado no encontrado." });
-    }
-
-    const nombreFoto = result[0].foto;
-
-    // 2. Eliminar la foto del sistema de archivos si existe
-    if (nombreFoto) {
-      const rutaFoto = path.join(__dirname, "../uploads/empleados", nombreFoto);
-
-      fs.unlink(rutaFoto, (unlinkErr) => {
-        if (unlinkErr && unlinkErr.code !== "ENOENT") {
-          console.warn("⚠️ No se pudo eliminar la imagen:", unlinkErr.message);
-        } else {
-          console.log("🗑️ Imagen eliminada:", nombreFoto);
-        }
-      });
-    }
-
-    // 3. Eliminar el empleado
-    const sqlDelete = "DELETE FROM empleados WHERE idempleados = ?";
-    const queryDelete = mysql.format(sqlDelete, [idempleados]);
-
-    connection.query(queryDelete, (deleteErr, deleteResult) => {
-      if (deleteErr) {
-        console.error("Error al eliminar empleado:", deleteErr);
-        return res.status(500).send({ message: "Error al eliminar el empleado.", error: deleteErr });
-      }
-
-      res.status(200).send({ message: "Empleado eliminado con éxito." });
-    });
-  });
-}
-
 */
+
 module.exports = {
   createEmployee,
   getEmployees,
   updateEmployee,
   deleteEmployee,
   getEmployeeById,
-  getTechnicians,
-  getapplicants
+  login,
 };

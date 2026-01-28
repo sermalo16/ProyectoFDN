@@ -150,15 +150,7 @@ export default function CreateAsigment() {
                 </Select>
               </Form.Item>
             </Col>
-            <Col span={12}>
-              <Form.Item label="Empresa" name="empresa">
-                <Select placeholder="Seleccione empresa">
-                  {empresas.map((e, idx) => (
-                    <Option key={idx}>{e}</Option>
-                  ))}
-                </Select>
-              </Form.Item>
-            </Col>
+            
           </Row>
 
           {/* Equipos */}
