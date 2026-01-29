@@ -9,8 +9,10 @@ router.post("/post-inventory", inventoryController.createInventario);
 // Obtener articulos
 router.get("/get-inventory", inventoryController.getInventario);
 
-// Obtener por departamentos
-router.get("/get-inventory-by-deparment", inventoryController.getInventarioByDepartment);
+//ver invantario por categorias
+router.get("/get-inventory-category/:id_categoria", inventoryController.getInventarioByCategory);
+
+
 
 //Actualizar
 router.put("/put-inventory/:idinventario", inventoryController.updateInventario);
