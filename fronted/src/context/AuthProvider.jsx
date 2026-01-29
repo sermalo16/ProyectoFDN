@@ -11,7 +11,7 @@ import {
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [employee, setEmployee] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -30,7 +30,7 @@ export const AuthProvider = ({ children }) => {
       const decoded = jwtDecode(accessToken);
       if (isTokenExpired(decoded)) return handleLogout();
 
-      setUser(decoded);
+      setEmployee(decoded);
     } catch {
       handleLogout();
     } finally {
@@ -45,11 +45,11 @@ export const AuthProvider = ({ children }) => {
 
   const handleLogout = () => {
     autoLogout();
-    setUser(null);
+    setEmployee(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, setUser, logout: handleLogout, isLoading }}>
+    <AuthContext.Provider value={{ employee, setEmployee, logout: handleLogout, isLoading }}>
       {children}
     </AuthContext.Provider>
   );

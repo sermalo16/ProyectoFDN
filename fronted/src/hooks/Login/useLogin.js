@@ -9,7 +9,7 @@ import { useAuth } from "../../context/AuthProvider";
 
 export const useLogin = () => {
   const navigate = useNavigate();
-  const { setUser } = useAuth();
+  const { setEmployee } = useAuth();
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -24,16 +24,18 @@ export const useLogin = () => {
         saveToken(res.accessToken);
 
         const decoded = jwtDecode(res.accessToken);
-        const userData = { id: decoded.id, tipo: decoded.tipo, name: decoded.name };
+        const employeeData = { id: decoded.idempleados, identidad: decoded.identidad, 
+          correo: decoded.Correo, Roles: decoded.Roles,  rrh_codigo: decoded.rrh_codigo, 
+          nombre: decoded.nombre, apellido: decoded.apellido, };
 
-        setUser(userData);
+        setEmployee(employeeData);
 
-        if (userData.tipo === "Tecnico") navigate("/admin", { replace: true });
+        if (employeeData.Roles === "T") navigate("/admin", { replace: true });
         else navigate("/basic", { replace: true });
       } else {
         notification.error({
           message: "Error de login",
-          description: "Credenciales inválidas",
+          description: res.message || "Error al conectar con el servidor",
           placement: "bottomRight",
         });
       }

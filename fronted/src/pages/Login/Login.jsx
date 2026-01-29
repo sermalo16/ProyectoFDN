@@ -36,9 +36,9 @@ export default function Login() {
               autoComplete="on"
             >
               <Form.Item
-              id="user"
-                name="user"
-                autoComplete="user"
+              id="correo"
+                name="correo"
+                autoComplete="correo"
                 rules={[{ required: true, message: "Ingrese su correo" }]}
               >
                 <Input
@@ -48,9 +48,9 @@ export default function Login() {
               </Form.Item>
 
               <Form.Item
-              id="password"
-                name="password"
-                autoComplete="password"
+              id="clave"
+                name="clave"
+                autoComplete="clave"
                 rules={[{ required: true, message: "Ingresa tu clave!" }]}
               >
                 <Input.Password

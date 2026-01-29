@@ -53,7 +53,8 @@ function SessionWatcher() {
 }
 
 export default function AppRouter() {
-  const { user, isLoading } = useAuth();
+  const { employee, isLoading } = useAuth();
+   
 
   if (isLoading) return <LoadingPage message="Verificando sesión del usuario..." />;
 
@@ -65,9 +66,9 @@ export default function AppRouter() {
         <Route
           path="/"
           element={
-            user ? (
+            employee ? (
               <Navigate
-                to={user.tipo === "Tecnico" ? "/admin" : "/basic"}
+                to={employee.Roles === "T" ? "/admin" : "/basic"}
                 replace
               />
             ) : (
@@ -80,9 +81,9 @@ export default function AppRouter() {
         <Route
           path="/login"
           element={
-            user ? (
+            employee ? (
               <Navigate
-                to={user.tipo === "Tecnico" ? "/admin" : "/basic"}
+                to={employee.Roles === "T" ? "/admin" : "/basic"}
                 replace
               />
             ) : (
@@ -92,14 +93,14 @@ export default function AppRouter() {
         />
 
         {/* Portal Solicitante */}
-        <Route element={<PrivateRoute allowedRoles={["Solicitante"]} />}>
+        <Route element={<PrivateRoute allowedRoles={["S"]} />}>
           <Route path="/basic" element={<BasicLayout />}>
             <Route index element={<p>Bienvenido Solicitante</p>} />
           </Route>
         </Route>
 
         {/* Portal Técnico */}
-        <Route element={<PrivateRoute allowedRoles={["Tecnico"]} />}>
+        <Route element={<PrivateRoute allowedRoles={["T"]} />}>
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<TiketsPage />} />
             <Route path="manuals" element={<ManualsPage />} />

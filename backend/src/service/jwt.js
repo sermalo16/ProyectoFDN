@@ -2,12 +2,15 @@ const jwt = require("jwt-simple");
 const moment = require("moment");
 require("dotenv").config();
 
-exports.createAccessToken = function(user) {
+exports.createAccessToken = function(empleado) {
   const payload = {
-    id: user.idusuarios,
-    user: user.correo,
-    description: user.descripcion,
-    tipo: user.tipo_usuario,
+    id: empleado.idempleados,
+    identidad: empleado.identidad,
+    correo: empleado.Correo,
+    Roles: empleado.Roles,
+    rrh_codigo: empleado.rrh_codigo,
+    nombre: empleado.nombre,
+    apellido: empleado.apellido,
     createToken: moment().unix(),
     exp: moment().add(3, "hours").unix()
   };
@@ -15,9 +18,9 @@ exports.createAccessToken = function(user) {
   return jwt.encode(payload, process.env.SECRET_KEY);
 };
 
-exports.createRefreshToken = function(user) {
+exports.createRefreshToken = function(empleado) {
   const payload = {
-    id: user.idusuarios,
+    id: empleado.idempleados,
     exp: moment().add(3, "hours").unix()
   };
 

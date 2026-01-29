@@ -1,12 +1,12 @@
 
 
 
-export const loginApi = async ({ user, password }) => {
+export const loginApi = async ({ correo, clave }) => {
   try {
     const res = await fetch("http://localhost:3308/api/v1/users/sign-in", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ user, password }),
+      body: JSON.stringify({ correo, clave }),
     });
 
     return await res.json();

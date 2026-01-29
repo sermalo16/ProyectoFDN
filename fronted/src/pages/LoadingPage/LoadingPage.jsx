@@ -31,7 +31,7 @@ export default function LoadingPage({ message = "Cargando datos..." }) {
           animate={{ width: "100%" }}
           transition={{ duration: 2, repeat: Infinity, repeatType: "mirror" }}
         >
-          <Progress percent={100} showInfo={false} strokeWidth={6} />
+          <Progress percent={100} showInfo={false}  />
         </motion.div>
       </motion.div>
     </div>
