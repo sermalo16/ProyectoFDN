@@ -52,18 +52,50 @@ function createInventario(req, res) {
 
   connection.query(query, (err, result) => {
     if (err) {
-      if (err.errno === 1062) {
-        return res.status(409).send({ message: "El código de auditoría ya existe." });
+        if (err.code === "ER_DUP_ENTRY") {
+          let message = "Registro duplicado.";
+
+          if (err.sqlMessage.includes("codigo_auditoria")) {
+            message = "Ya existe un activo con el mismo código de auditoría.";
+          } else if (err.sqlMessage.includes("service_tag")) {
+            message = "Ya existe un activo con el mismo service tag.";
+          }else if (err.sqlMessage.includes("serie")) {
+            message = "Ya existe un activo con la misma serie.";
+          }
+
+          return res.status(400).send({ message });
+        }
+
+        return res.status(500).json({
+          message: "Error al crear activo",
+          error: err
+        });
       }
-      console.error(err);
-      return res.status(500).send({ message: "Error al registrar el activo." });
-    }
 
     res.status(201).send({ message: "Activo registrado con éxito.", result });
   });
 }
 
-// Obtener inventario disponible
+//obtener todos los activos que existen
+function getInventarioExist(req, res) {
+  const sql = `
+    
+SELECT *
+FROM inventario;
+  `;
+  connection.query(sql, (err, results) => {
+    if (err) {
+      return res.status(500).send({ message: "Error al obtener el inventario.", error: err });
+    }
+    const data = results.map(row => ({
+      ...row,
+      fecha_ingreso: moment(row.fecha_ingreso).format("YYYY-MM-DD")
+    }));
+    res.status(200).json(data);
+  });
+}
+
+// Obtener inventario disponible general
 function getInventario(req, res) {
   const sql = `
     
@@ -110,11 +142,146 @@ WHERE id_categoria = ?;
     res.status(200).json(data);
   });
 }
+
 //obtener inventario asignado general
-//Obtener inventario asignado por ID de usuario
+function getInventoryAsigned(req, res) {
+  const sql = `
+    
+SELECT *
+FROM inventario
+WHERE estado = 'asignado';
+  `;
+
+  connection.query(sql, (err, results) => {
+    if (err) {
+      return res.status(500).send({ message: "Error al obtener el inventario Asignado.", error: err });
+    }
+
+    const data = results.map(row => ({
+      ...row,
+      fecha_ingreso: moment(row.fecha_ingreso).format("YYYY-MM-DD")
+    }));
+
+    res.status(200).json(data);
+  });
+}
+
+//obtener inventario asignado por categorias
+function getInventoryAsignedByCategory(req, res) {
+  const { id_categoria } = req.params;
+  const sql = `
+    
+SELECT *
+FROM inventario
+WHERE estado = 'asignado' AND id_categoria = ?;
+  `;
+
+  connection.query(sql, [id_categoria], (err, results) => {
+    if (err) {
+      return res.status(500).send({ message: "Error al obtener el inventario Asignado por categoria.", error: err });
+    }
+
+    const data = results.map(row => ({
+      ...row,
+      fecha_ingreso: moment(row.fecha_ingreso).format("YYYY-MM-DD")
+    }));
+
+    res.status(200).json(data);
+  });
+}
+
+//obtener inventario disponible por categorias
+function getInventoryAvailableByCategory(req, res) {
+  const { id_categoria } = req.params;
+  const sql = `
+    
+SELECT *
+FROM inventario
+WHERE estado = 'disponible' AND id_categoria = ?;
+  `;
+  connection.query(sql, [id_categoria], (err, results) => {
+    if (err) {
+      return res.status(500).send({ message: "Error al obtener el inventario Disponible por categoria.", error: err });
+    }
+    const data = results.map(row => ({
+      ...row,
+      fecha_ingreso: moment(row.fecha_ingreso).format("YYYY-MM-DD")
+    }));
+    res.status(200).json(data);
+  });
+}
+
+//Obtener inventario asignado por ID de empleado
+function getInventoryAsignedByEmployee(req, res) {
+  const { id_empleado } = req.params;
+  const sql = `select i.* from inventario i join asignacion_detalle ad on i.idinventario = ad.idinventario join asignaciones a on ad.idasignacion = a.idasignacion 
+join empleados e on a.idempleado = e.idempleados where e.idempleados = ? and i.estado = 'asignado';`;
+
+  connection.query(sql, [id_empleado], (err, results) => {
+    if (err) {
+      return res.status(500).send({ message: "Error al obtener el inventario asignado por empleado.", error: err });
+    } 
+
+    const data = results.map(row => ({
+      ...row,
+      fecha_ingreso: moment(row.fecha_ingreso).format("YYYY-MM-DD")
+    }));
+
+    res.status(200).json(data);
+  });
+}
+
+
+
 //dar de baja el inventario
+function WriteOffInvetory(req, res) {
+  const { idinventario } = req.params;
+  const { fecha_baja, motivo_de_baja, realizado_por } = req.body;
+
+ // 🔹 Validación centralizada
+  const requiredFields = {
+    idinventario: "El ID del inventario es obligatorio",
+    fecha_baja: "La fecha de baja es obligatoria",
+    motivo_de_baja: "El motivo de baja es obligatorio",
+    realizado_por: "El responsable de la baja es obligatorio"
+  };
+
+  for (const [field, message] of Object.entries(requiredFields)) {
+    if (!req.body[field]) {
+      return res.status(400).json({ message });
+    }
+  }
+  const sql = `INSERT INTO inventario_defectuoso (idinventario, fecha_baja, motivo_de_baja, realizado_por) VALUES (?, ?, ?, ?)`;
+
+  const values = [
+    idinventario,
+    fecha_baja,
+    motivo_de_baja,
+    realizado_por,
+  ];
+
+  const query = mysql.format(sql, values);
+
+  connection.query(query, (err, result) => {
+    if (err) {
+      return res.status(500).send({ message: "Error al dar de baja el activo.", error: err });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).send({ message: "Activo no encontrado." });
+    }
+
+    res.status(200).send({ message: "Activo dado de baja con éxito." });
+  });
+}
+
 //ver quien le da baja al inventario
 //colocar activo en reparacion
+
+
+
+
+
 
 
 // Actualizar inventario
@@ -196,5 +363,10 @@ module.exports = {
   getInventario,
   updateInventario,
   deleteInventario,
-  getInventarioByCategory
+  getInventarioByCategory,
+  getInventoryAsigned,
+  getInventoryAsignedByCategory,
+  getInventoryAvailableByCategory,
+  getInventoryAsignedByEmployee,
+  getInventarioExist
 };
