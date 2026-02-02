@@ -13,4 +13,17 @@ END$$
 DELIMITER ;
 
 
-#nuevos triggers
+#triggers para colar reparacion a un activo en el inventario
+DELIMITER $$
+
+CREATE TRIGGER trg_reparacion_inventario
+AFTER INSERT ON reparaciones_inventario
+FOR EACH ROW
+BEGIN
+    UPDATE inventario
+    SET estado = 'en_reparacion'
+    WHERE idinventario = NEW.id-inventario;
+END$$
+
+DELIMITER ;
+

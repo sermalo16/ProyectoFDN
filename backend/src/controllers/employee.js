@@ -527,5 +527,4 @@ module.exports = {
   searchEmployeeByIdentity,
   getEmployeesByDepartment,
   getEmployeeByCompany
-  
 };

@@ -6,7 +6,7 @@ const path = require("path");
 
 
 
-//#region funciones get 
+//#region funciones get
 //obtener todos los activos que existen
 function getInventarioExist(req, res) {
   const sql = `
@@ -414,6 +414,8 @@ function RepairInventory(req, res) {
   });
 
 }
+
+
 
 //#endregion
 
