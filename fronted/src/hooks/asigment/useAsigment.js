@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Form, notification } from "antd";
-import { getInventory } from "../../services/Inventory";
+import { getInventoryExist } from "../../services/Inventory";
 import { getEmployees } from "../../services/employees";
 import { getAsigment, createAsigment } from "../../services/asigment";
 
@@ -15,7 +15,7 @@ export const useAsigmentManager = () => {
   // ===========================
   const fetchInventory = async () => {
     try {
-      const data = await getInventory();
+      const data = await getInventoryExist();
       setInventory(data);
     } catch (err) {
       console.error("Error al cargar inventario:", err);

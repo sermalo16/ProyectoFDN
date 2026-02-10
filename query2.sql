@@ -52,6 +52,7 @@ ORDER BY d.departamento, i.idinventario ASC;
 
 /*Asignaciones*/
 SELECT 
+ROW_NUMBER() OVER (ORDER BY e.idempleados) AS numero_registro, -- enumerar registros
 e.idempleados, 
 e.nombre, 
 e.apellido, 
@@ -60,7 +61,9 @@ d.departamento,
 a.idasignaciones,
 a.fecha_asignacion,
 a.observaciones,
-a.asignado_por 
+a.asignado_por,
+a.mouse,
+a.mochila
 from empleados e join departamentos d on e.iddepartamento = d.iddepartamentos 
 join asignaciones a on e.idempleados = a.idempleado 
 order by e.idempleados;
@@ -73,4 +76,23 @@ where a.idasignaciones = 1
 order by a.idasignaciones;
 
 /*Activos por usuarios*/
+
+SELECT 
+        a.idasignaciones,
+        ad.id,
+        ad.nuevo_usado,
+        i.idinventario,
+        i.codigo_auditoria,
+        i.service_tag,
+        i.nombre_activo,
+        i.marca,
+        i.modelo,
+        i.valor,
+        c.categoria
+      FROM asignaciones a
+      JOIN asignaciones_detalle ad ON a.idasignaciones = ad.idasignaciones
+      JOIN inventario i ON ad.idinventario = i.idinventario
+      JOIN categorias c ON i.id_categoria = c.idcategoria
+      WHERE a.idasignaciones IN (1)
+      ORDER BY a.idasignaciones;
 

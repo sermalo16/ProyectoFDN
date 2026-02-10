@@ -9,11 +9,14 @@ const path = require("path");
 //#region funciones get
 //obtener todos los activos que existen
 function getInventarioExist(req, res) {
-  const sql = `
-    
-SELECT *
-FROM inventario;
-  `;
+  const sql = `SELECT
+  ROW_NUMBER() OVER (ORDER BY i.idinventario) AS item_num,
+  i.*,
+  c.categoria
+FROM inventario AS i
+JOIN categorias AS c
+  ON i.id_categoria = c.idcategoria
+ORDER BY i.idinventario;`;
   connection.query(sql, (err, results) => {
     if (err) {
       return res.status(500).send({ message: "Error al obtener el inventario.", error: err });

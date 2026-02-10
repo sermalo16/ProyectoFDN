@@ -1,442 +1,204 @@
-import React, { use, useEffect, useState } from "react";
+import React from "react";
 import {
   Table,
   Button,
-  Modal,
-  Form,
-  Input,
   Space,
   Popconfirm,
-  notification,
   Row,
   Col,
   Select,
-  Tabs
+  Input,
+  Card,
+  Tag
 } from "antd";
-import { PlusOutlined, EditOutlined, DeleteOutlined,   } from "@ant-design/icons";
 import {
-  createInventory,
-  updateInventory,
-  deleteInventory,
-  getInventory,
-  getInventoryByDepartment
-} from "../../../services/Inventory";
+  PlusOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  ReloadOutlined
+} from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
 
-import { getCategories } from "../../../services/categories";
-
+import { useInventoryPage } from "../../../hooks/Inventory/useInventoryPage";
 
 const { Option } = Select;
-const { TabPane } = Tabs;
 
 export default function InventoryPages() {
-  const [inventory, setInventory] = useState([]);
-  const [inventoryAsignado, setinventoryAsignado] = useState([]);
-  const [category, setCategory] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [form] = Form.useForm();
-  const [editingInventory, setEditingInventory] = useState(null);
+  const navigate = useNavigate();
 
-  // 🔧 Placeholder para futuros datos
-  const fetchInventory = async () => {
-    setLoading(true);
-    try {
-      // TODO: conectar con tu servicio real
-      const data = await getInventory();      
-      setInventory(data);
-    } catch (err) {
-      notification.error({
-        message: "Error",
-        description: "Error al cargar el inventario.",
-        placement: "bottomRight",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+  const {
+    inventory,
+    categories,
+    loading,
 
-  const fetchInventoryByDepartment = async () => {
-    setLoading(true);
-    try {
-      // TODO: conectar con tu servicio real
-      const data = await getInventoryByDepartment();
-      setinventoryAsignado(data);
-    } catch (err) {
-      notification.error({
-        message: "Error",
-        description: "Error al cargar el inventario.",
-        placement: "bottomRight",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+    search,
+    setSearch,
+    filterCategoria,
+    setFilterCategoria,
+    filterEstado,
+    setFilterEstado,
+    resetFilters,
 
+    handleDelete,
+    refreshInventory
+  } = useInventoryPage();
 
-
-  const fetchCategory = async () => {
-    try {
-      const data = await getCategories();
-      setCategory(data);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  useEffect(() => {
-    fetchInventory();
-    fetchCategory();
-    fetchInventoryByDepartment();
-  }, []);
-
-  const openModal = (item = null) => {
-    setEditingInventory(item);
-    setIsModalOpen(true);
-    form.resetFields();
-
-    if (item) {
-      form.setFieldsValue(item);
-    }
-  };
-
-  const handleOk = async () => {
-    try {
-      const values = await form.validateFields();
-
-      if (editingInventory) {
-              const res = await updateInventory(
-                editingInventory.idinventario,
-                values
-              );
-              notification.success({
-                message: "Actualizado",
-                description: res.message || "Activo actualizado correctamente.",
-                placement: "topRight",
-                duration: 3,
-              });
-            } else {
-              const res = await createInventory(values);
-              console.log(res);
-              notification.success({
-                message: "Creado",
-                description: res.message || "Equipo creado correctamente.",
-                placement: "topRight",
-                duration: 3,
-              });
-            }
-
-      setIsModalOpen(false);
-      fetchInventory();
-    } catch (err) {
-      notification.error({
-        message: "Error",
-        description: err.message || "Error al guardar el equipo.",
-        placement: "bottomRight",
-      });
-    }
-  };
-
-  const handleDelete = async (id) => {
-    try {
-      // TODO: conectar con tu servicio
-      const res = await deleteInventory(id);
-      notification.success({
-        message: "Eliminado",
-        description: res.message || "Activo eliminado correctamente.",
-        placement: "topRight",
-        duration: 3,
-      });
-      fetchInventory();
-    } catch (err) {
-      notification.error({
-        message: "Error",
-        description: err.message || "Error al eliminar equipo.",
-        placement: "topRight",
-        duration: 3,
-      });
-    }
-  };
-
+  /* =====================
+     COLUMNAS
+  ===================== */
   const columns = [
     {
       title: "#",
-      dataIndex: "total_registros",
-      key: "total_registros",
-      width: 80,
-      ellipsis: true,
-      
-    },
-    {
-      title: "Datos del Activo",
-      dataIndex: "nombre_activo",
-      key: "nombre_activo",
-      width: 200,
-      ellipsis: true,
-      sorter: (a, b) => a.nombre_activo.localeCompare(b.nombre_activo),
-    },
-    {
-      title: "Codigo de Auditoria",
-      dataIndex: "codigo_auditoria",
-      key: "codigo_auditoria",
-      width: 200,
-      ellipsis: true,
-      sorter: (a, b) => a.codigo_auditoria.localeCompare(b.codigo_auditoria),
-    },
-    {
-      title: "Categoria",
-      dataIndex: "categoria",
-      key: "categoria",
-      width: 200,
-      ellipsis: true,
-      sorter: (a, b) => a.categoria.localeCompare(b.categoria),
-    },
-    {
-      title: "Service Tag",
-      dataIndex: "service_tag",
-      key: "service_tag",
-      width: 200,
-      ellipsis: true,
-      sorter: (a, b) => a.service_tag.localeCompare(b.service_tag),
-    },
-    {
-      title: "Descripcion del activo",
-      dataIndex: "descripcion",
-      key: "descripcion",
-      width: 200,
-      ellipsis: true,
-    },
-    {
-      title: "Marca",
-      dataIndex: "marca",
-      key: "marca",
-      width: 200,
-      ellipsis: true,
-      sorter: (a, b) => a.marca.localeCompare(b.marca),
+      dataIndex: "item_num"
     },
     {
       title: "Modelo",
-      dataIndex: "modelo",
-      key: "modelo",
-      width: 200,
-      ellipsis: true,
-      sorter: (a, b) => a.modelo.localeCompare(b.modelo),
+      dataIndex: "modelo"
+    },
+    {
+      title: "Marca",
+      dataIndex: "marca"
     },
     {
       title: "Serie",
-      dataIndex: "serie",
-      key: "serie",
-      width: 200,
-      ellipsis: true,
-      sorter: (a, b) => a.serie.localeCompare(b.serie),
+      dataIndex: "serie"
     },
     {
-      title: "Fecha de Adquisicion",
-      dataIndex: "fecha_ingreso",
-      key: "fecha_ingreso",
-      width: 200,
-      ellipsis: true,
-      sorter: (a, b) => new Date(a.fecha_ingreso) - new Date(b.fecha_ingreso)
+      title: "Service Tag",
+      dataIndex: "service_tag"
     },
     {
-      title: "valor del activo",
-      dataIndex: "valor",
-      key: "valor",
-      width: 200,
-      ellipsis: true,
-      sorter: (a, b) => a.valor - b.valor, // 🔢 orden numérico
-      render: (text) => `L. ${text}`,
+      title: "Valor",
+      dataIndex: "valor"
+    },
+    {
+      title: "Estado",
+      dataIndex: "estado",
+      render: (estado) => {
+        const color =
+          estado === "DISPONIBLE"
+            ? "green"
+            : estado === "ASIGNADO"
+            ? "blue"
+            : "orange";
+        return <Tag color={color}>{estado}</Tag>;
+      }
     },
     {
       title: "Acciones",
-      key: "acciones",
       fixed: "right",
+      width: 120,
       render: (_, record) => (
-        <Row gutter={[8, 8]}>
-          <Col>
-            <Button
-              icon={<EditOutlined />}
-              onClick={() => openModal(record)}
-              size="small"
-            >
-              Editar Activo
-            </Button>
-          </Col>
-          <Col>
-            <Popconfirm
-              title="¿Seguro que deseas eliminar?"
-              onConfirm={() => handleDelete(record.idinventario)}
-            >
-              <Button icon={<DeleteOutlined />} danger size="small">
-                Eliminar Activo
-              </Button>
-            </Popconfirm>
-          </Col>
-        </Row>
-      ),
-    },
+        <Space>
+          <Button
+            type="text"
+            icon={<EditOutlined />}
+            onClick={() =>
+              navigate(`/inventario/editar/${record.idinventario}`)
+            }
+          />
+          <Popconfirm
+            title="¿Eliminar este activo?"
+            onConfirm={() => handleDelete(record.idinventario)}
+          >
+            <Button type="text" danger icon={<DeleteOutlined />} />
+          </Popconfirm>
+        </Space>
+      )
+    }
   ];
 
-  const columnsAsignado = [
-  ...columns.filter((col) => col.key !== "acciones"), // quitamos la columna de acciones
-  {
-    title: "Departamento",
-    dataIndex: "departamento",
-    key: "departamento",
-    width: 200,
-    sorter: (a, b) => a.departamento.localeCompare(b.departamento),
-  },
-];
-
+  /* =====================
+     UI
+  ===================== */
   return (
     <div>
-      <h2>Gestión de Inventario</h2>
+      {/* HEADER */}
+      <Row justify="space-between" align="middle" style={{ marginBottom: 16 }}>
+        <Col>
+          <h2 style={{ marginBottom: 0 }}>Inventario IT</h2>
+          <span style={{ color: "#8c8c8c" }}>
+            Gestión y control de activos tecnológicos
+          </span>
+        </Col>
+        <Col>
+          <Space>
+            <Button
+              icon={<ReloadOutlined />}
+              onClick={refreshInventory}
+            />
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={() => navigate("/inventario/nuevo")}
+            >
+              Nuevo activo
+            </Button>
+          </Space>
+        </Col>
+      </Row>
 
-      <Button
-        type="primary"
-        icon={<PlusOutlined />}
-        style={{ marginBottom: 16 }}
-        onClick={() => openModal()}
-      >
-        Agregar nuevo equipo
-      </Button>
+      {/* FILTROS */}
+      <Card style={{ marginBottom: 16 }}>
+        <Row gutter={[16, 16]}>
+          <Col span={6}>
+            <Input.Search
+              placeholder="Buscar por nombre, código o serie"
+              value={search}
+              allowClear
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </Col>
 
-      {/* Pestañas de inventario */}
-      <Tabs defaultActiveKey="1">
-        <TabPane tab="Inventario en bodega de IT" key="1">
-          <Table
-            rowKey="idinventario"
-            columns={columns}
-            dataSource={inventory}
-            loading={loading}
-            scroll={{ x: "max-content", y: 400 }}
-            pagination={{ pageSize: 10 }}
-          />
-        </TabPane>
-        <TabPane tab="Inventario asignado" key="2">
-          <Table
-            rowKey="idinventario"
-            columns={columnsAsignado}
-            dataSource={inventoryAsignado}
-            loading={loading}
-            scroll={{ x: "max-content", y: 400 }}
-            pagination={{ pageSize: 10 }}
-          />
-        </TabPane>
-      </Tabs>
+          <Col span={5}>
+            <Select
+              placeholder="Categoría"
+              allowClear
+              value={filterCategoria}
+              style={{ width: "100%" }}
+              onChange={setFilterCategoria}
+            >
+              {categories.map((c) => (
+                <Option key={c.idcategoria} value={c.idcategoria}>
+                  {c.categoria}
+                </Option>
+              ))}
+            </Select>
+          </Col>
 
-      {/* Modal para agregar/editar equipos */}
-      <Modal
-        open={isModalOpen}
-        title={editingInventory ? "Editar equipo" : "Agregar nuevo equipo"}
-        onCancel={() => setIsModalOpen(false)}
-        onOk={handleOk}
-        okText={editingInventory ? "Actualizar" : "Crear"}
-        destroyOnClose
-        width={800}
-      >
-        <Form form={form} layout="vertical">
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item
-                name="codigo_auditoria"
-                label="Código de auditoría"
-                rules={[
-                  { required: true, message: "Ingrese el código de auditoría" },
-                ]}
-              >
-                <Input />
-              </Form.Item>
-            </Col>
+          <Col span={5}>
+            <Select
+              placeholder="Estado"
+              allowClear
+              value={filterEstado}
+              style={{ width: "100%" }}
+              onChange={setFilterEstado}
+              
+            >
+              <Option value="disponible">Disponible</Option>
+              <Option value="asignado">Asignado</Option>
+              <Option value="reparacion">Reparación</Option>
+              <Option value="todos">Todos</Option>
+            </Select>
+          </Col>
 
-            <Col span={12}>
-              <Form.Item
-                name="idcategoria"
-                label="Categoria"
-                rules={[{ required: true, message: "Selecciona una categoria" }]}
-              >
-                <Select placeholder="Selecciona">
-                  {category.map((d) => (
-                    <Option key={d.idcategoria} value={d.idcategoria}>
-                      {d.categoria}
-                    </Option>
-                  ))}
-                </Select>
-              </Form.Item>
-            </Col>
-          </Row>
+          <Col span={4}>
+            <Button block onClick={resetFilters}>
+              Limpiar filtros
+            </Button>
+          </Col>
+        </Row>
+      </Card>
 
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item
-                name="service_tag"
-                label="Service Tag"
-                rules={[{ required: true, message: "Ingrese el Service Tag" }]}
-              >
-                <Input />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                name="nombre_activo"
-                label="Nombre del activo"
-                rules={[{ required: true, message: "Ingrese el nombre del activo" }]}
-              >
-                <Input />
-              </Form.Item>
-            </Col>
-          </Row>
-
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item
-                name="marca"
-                label="Marca"
-                rules={[{ required: true, message: "Ingrese la marca" }]}
-              >
-                <Input />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                name="modelo"
-                label="Modelo"
-                rules={[{ required: true, message: "Ingrese el modelo" }]}
-              >
-                <Input />
-              </Form.Item>
-            </Col>
-          </Row>
-
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item
-                name="serie"
-                label="Serie"
-                rules={[{ required: true, message: "Ingrese la serie" }]}
-              >
-                <Input />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                name="valor"
-                label="Valor (Lempiras)"
-                rules={[{ required: true, message: "Ingrese el valor del equipo" }]}
-              >
-                <Input type="number" min={0} />
-              </Form.Item>
-            </Col>
-          </Row>
-
-          <Form.Item
-            name="descripcion"
-            label="Descripción"
-            rules={[{ required: true, message: "Ingrese una descripción" }]}
-          >
-            <Input.TextArea rows={3} />
-          </Form.Item>
-        </Form>
-      </Modal>
+      {/* TABLA */}
+      <Table
+        rowKey="idinventario"
+        columns={columns}
+        dataSource={inventory}
+        loading={loading}
+        pagination={{ pageSize: 10 }}
+        scroll={{ x: "max-content" }}
+      />
     </div>
   );
 }

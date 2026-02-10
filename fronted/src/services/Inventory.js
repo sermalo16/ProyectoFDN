@@ -1,8 +1,8 @@
 const API_BASE = "http://localhost:3308/api/v1/inventory";
 
 // Obtener Inventario
-export const getInventory = async () => {
-  const res = await fetch(API_BASE + "/get-inventory");
+export const getInventoryExist = async () => {
+  const res = await fetch(API_BASE + "/get-inventory-exist");
 
   if (!res.ok) {
     const errorBody = await res.json();
