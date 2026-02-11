@@ -164,7 +164,7 @@ export default function TiketPage() {
         <h2>Mis solicitudes pendientes</h2>
 
         <Space>
-          <Button type="primary" onClick={() => navigate("/admin/createTiket")}>
+          <Button type="primary" onClick={() => navigate("/admin/tikets/createTiket")}>
             Nuevo incidente
           </Button>
 

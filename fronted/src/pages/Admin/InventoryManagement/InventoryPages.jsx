@@ -43,6 +43,15 @@ export default function InventoryPages() {
     refreshInventory
   } = useInventoryPage();
 
+  const handleSearchChange = (value) => {
+  setSearch(value);
+
+  if (value.trim() !== "") {
+    setFilterCategoria("Todos");
+    setFilterEstado("Todos");
+  }
+};
+
   /* =====================
      COLUMNAS
   ===================== */
@@ -66,6 +75,10 @@ export default function InventoryPages() {
     {
       title: "Service Tag",
       dataIndex: "service_tag"
+    },
+    {
+      title: "Codigo Auditoria",
+      dataIndex: "codigo_auditoria"
     },
     {
       title: "Valor",
@@ -130,7 +143,7 @@ export default function InventoryPages() {
             <Button
               type="primary"
               icon={<PlusOutlined />}
-              onClick={() => navigate("/inventario/nuevo")}
+              onClick={() => navigate("createInventory")}
             >
               Nuevo activo
             </Button>
@@ -143,10 +156,10 @@ export default function InventoryPages() {
         <Row gutter={[16, 16]}>
           <Col span={6}>
             <Input.Search
-              placeholder="Buscar por nombre, código o serie"
+              placeholder="Buscar por service tag, código o serie"
               value={search}
               allowClear
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => handleSearchChange(e.target.value)}
             />
           </Col>
 
@@ -158,6 +171,7 @@ export default function InventoryPages() {
               style={{ width: "100%" }}
               onChange={setFilterCategoria}
             >
+              <Option value="Todos">Todos</Option>
               {categories.map((c) => (
                 <Option key={c.idcategoria} value={c.idcategoria}>
                   {c.categoria}
@@ -173,12 +187,12 @@ export default function InventoryPages() {
               value={filterEstado}
               style={{ width: "100%" }}
               onChange={setFilterEstado}
-              
             >
+              <Option value="Todos">Todos</Option>
               <Option value="disponible">Disponible</Option>
               <Option value="asignado">Asignado</Option>
               <Option value="reparacion">Reparación</Option>
-              <Option value="todos">Todos</Option>
+              <Option value="prestamo">Préstamo</Option>
             </Select>
           </Col>
 
@@ -196,7 +210,7 @@ export default function InventoryPages() {
         columns={columns}
         dataSource={inventory}
         loading={loading}
-        pagination={{ pageSize: 10 }}
+        pagination={{ pageSize: 20 }}
         scroll={{ x: "max-content" }}
       />
     </div>

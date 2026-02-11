@@ -31,6 +31,7 @@ import AccessPage from "../pages/Admin/Configuration/AccessPage";
 import ProfilesPage from "../pages/Admin/profile/ProfilePage";
 import CategoryPages from "../pages/Admin/InventoryManagement/CategoryPages";
 import InventoryPages from "../pages/Admin/InventoryManagement/InventoryPages";
+import CreateInventoryPage from "../pages/Admin/InventoryManagement/CreateInventoryPage";
 import CompanyPage from "../pages/Admin/Company/CompanyPage";
 import CreateCompanyPage from "../pages/Admin/Company/CreateCompanyPage";
 
@@ -105,7 +106,7 @@ export default function AppRouter() {
             <Route index element={<TiketsPage />} />
             <Route path="manuals" element={<ManualsPage />} />
             <Route path="tikets" element={<TiketsPage />} />
-            <Route path="createTiket" element={<CreateTiketPage />} />
+            <Route path="tikets/createTiket" element={<CreateTiketPage />} />
             <Route path="asigment" element={<AsigmentPage />} />
             <Route path="createAsigment" element={<CreateAsigment />} />
             <Route path="configuration" element={<ConfigurationPage />} />
@@ -115,6 +116,7 @@ export default function AppRouter() {
             <Route path="profile" element={<ProfilesPage />} />
             <Route path="category" element={<CategoryPages />} />
             <Route path="inventory" element={<InventoryPages />} />
+            <Route path="inventory/createInventory" element={<CreateInventoryPage />} />
             <Route path="company" element={<CompanyPage />} />
             <Route path="createCompany" element={<CreateCompanyPage />} />
           </Route>

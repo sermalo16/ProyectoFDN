@@ -283,10 +283,20 @@ function createInventario(req, res) {
     estado
   } = req.body;
 
-  
+  const requiredFields = {
+    codigo_auditoria: "El código de auditoría es obligatorio.",
+    idcategoria: "La categoría es obligatoria.",
+    descripcion: "La descripción es obligatoria.",
+    valor: "El valor es obligatorio.",
+    serie: "La serie es obligatoria.",
+    service_tag: "El service tag es obligatorio.",
+    nombre_activo: "El nombre del activo es obligatorio."
+  };
 
-  if (!codigo_auditoria || !idcategoria || !descripcion  || !valor) {
-    return res.status(400).send({ message: "Los campos obligatorios son requeridos.", res: req.body });
+  for (const [field, message] of Object.entries(requiredFields)) {
+    if (!req.body[field]) {
+      return res.status(400).json({ message });
+    }
   }
 
   const fecha_ingreso = moment().format("YYYY-MM-DD");

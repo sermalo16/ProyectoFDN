@@ -19,6 +19,7 @@ import AccessPage from "../pages/Admin/Configuration/AccessPage";
 import ProfilesPage from "../pages/Admin/profile/ProfilePage";
 import CategoryPages from "../pages/Admin/InventoryManagement/CategoryPages";
 import InventoryPages from "../pages/Admin/InventoryManagement/InventoryPages";
+import CreateInventoryPage from "../pages/Admin/InventoryManagement/CreateInventoryPage";
 import CompanyPage from "../pages/Admin/Company/CompanyPage";
 import CreateCompanyPage from "../pages/Admin/Company/CreateCompanyPage";
 
@@ -42,7 +43,7 @@ const routes = [
       {path: "createAsigment", element: <CreateAsigment /> },
       { path: "manuals", element: <ManualsPage /> },
       { path: "tikets", element: <TiketsPage /> },
-      { path: "createTiket", element: <CreateTiketPage /> },
+      { path: "tikets/createTiket", element: <CreateTiketPage /> },
       { path: "configuration", element: <ConfigurationPage /> },
       { path: "departments", element: <DepartmentsPage /> },
       { path: "employees", element: <EmployeesPage /> },
@@ -50,6 +51,7 @@ const routes = [
       { path: "profile", element: <ProfilesPage /> },
       { path: "category", element: <CategoryPages /> },
       { path: "inventory", element: <InventoryPages /> },
+      { path: "inventory/createInventory", element: <CreateInventoryPage /> },
       { path: "company", element: <CompanyPage /> },
       { path: "createCompany", element: <CreateCompanyPage /> },
       // Página no encontrada dentro del admin
