@@ -4,7 +4,8 @@ import {
   getInventoryExist,
   deleteInventory,
   updateInventory,
-  createInventory as createInventoryService
+  createInventory as createInventoryService,
+  getInventoryById
 } from "../../services/Inventory";
 import { getCategories } from "../../services/categories";
 
@@ -21,6 +22,8 @@ export function useInventoryPage() {
   const [inventory, setInventory] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [currentInventory, setCurrentInventory] = useState(null);
+
 
   // filtros
   const [search, setSearch] = useState("");
@@ -75,6 +78,34 @@ export function useInventoryPage() {
   }, []);
 
   /* =====================
+  Fetch inventario por ID
+===================== */
+const fetchInventoryById = useCallback(async (idinventario) => {
+  setLoading(true);
+  try {
+    const data = await getInventoryById(idinventario);
+
+    // 👇 importante
+    if (Array.isArray(data)) {
+      setCurrentInventory(data[0] || null);
+    } else {
+      setCurrentInventory(data);
+    }
+
+  } catch (err) {
+    notification.error({
+      message: "Error",
+      description:
+        err?.response?.data?.message || "Error al obtener el activo",
+    });
+  } finally {
+    setLoading(false);
+  }
+}, []);
+
+
+
+  /* =====================
      CREAR INVENTARIO
   ===================== */
   const createInventory = useCallback(async (data) => {
@@ -114,6 +145,36 @@ export function useInventoryPage() {
   }, [fetchInventory]);
 
   /* =====================
+     ACTUALIZAR INVENTARIO
+  ===================== */
+  const updateInventoryItem = useCallback(async (id, data) => {
+    try {
+      const payload = {
+        ...data,
+      };
+
+      const res = await updateInventory(id, payload);
+
+      notification.success({
+        message: "Actualizado",
+        description:
+          res?.message || "Activo actualizado correctamente.",
+        placement: "topRight",
+      });
+
+      fetchInventory();
+    } catch (err) {
+      notification.error({
+        message: "Error",
+        description:
+          err.message ||
+          "No se pudo actualizar el activo",
+      });
+    }
+  }, [fetchInventory]);
+
+
+  /* =====================
      ELIMINAR (Optimista)
   ===================== */
   const handleDelete = useCallback(async (id) => {
@@ -149,7 +210,7 @@ export function useInventoryPage() {
     const hasSearch = q.length > 0;
 
     return inventory.filter((item) => {
-      const nombre = (item.nombre_activo ?? "").toLowerCase();
+      const nombre = (item.service_tag ?? "").toLowerCase();
       const codigo = (item.codigo_auditoria ?? "").toLowerCase();
       const serie = (item.serie ?? "").toLowerCase();
 
@@ -197,6 +258,7 @@ export function useInventoryPage() {
     inventory: filteredInventory,
     categories,
     loading,
+    currentInventory,
 
     // filtros
     search,
@@ -211,5 +273,7 @@ export function useInventoryPage() {
     createInventory,
     handleDelete,
     refreshInventory: fetchInventory,
+    fetchInventoryById,
+    updateInventory: updateInventoryItem
   };
 }

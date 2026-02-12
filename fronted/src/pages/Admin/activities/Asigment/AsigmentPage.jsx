@@ -57,7 +57,7 @@ export default function AsigmentPage() {
             <Col>
               <Button
                 icon={<EditOutlined />}
-                onClick={() => navigate("/admin/createAsigment")}
+                onClick={() => navigate("createAsigment")}
                 size="small"
               >
                 Devolver Activo
@@ -126,7 +126,7 @@ export default function AsigmentPage() {
         type="primary"
         icon={<PlusOutlined />}
         style={{ marginBottom: 16, marginRight: 20 }}
-        onClick={() => navigate("/admin/createAsigment")}
+        onClick={() => navigate("createAsigment")}
       >
         Nueva Asignación
       </Button>

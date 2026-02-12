@@ -39,6 +39,8 @@ export default function CreateAsigment() {
   const availableAccesorios = [
     { id: 1, accesorio: "Mouse", cantidad: 1 },
     { id: 2, accesorio: "Teclado", cantidad: 1 },
+    { id: 2, accesorio: "Mochila", cantidad: 1 },
+    { id: 2, accesorio: "Teclado", cantidad: 1 },
   ];
 
   // Columnas
@@ -46,6 +48,8 @@ export default function CreateAsigment() {
     { title: "Tipo", dataIndex: "tipo", key: "tipo" },
     { title: "Marca", dataIndex: "marca", key: "marca" },
     { title: "Modelo", dataIndex: "modelo", key: "modelo" },
+    { title: "Codigo Auditoria", dataIndex: "codigo_auditoria", key: "codigo_auditoria" },
+    { title: "Service Tag", dataIndex: "service_tag", key: "service_tag" },
     { title: "Valor", dataIndex: "Valor", key: "Valor" },
     {
       title: "Acciones",
@@ -161,7 +165,42 @@ export default function CreateAsigment() {
               icon={<PlusOutlined />}
               onClick={() => openModal("equipos")}
             >
-              Agregar equipo
+              Agregar Laptop
+            </Button>
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={() => openModal("equipos")}
+            >
+              Agregar Desktop
+            </Button>
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={() => openModal("equipos")}
+            >
+              Agregar Monitor
+            </Button>
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={() => openModal("equipos")}
+            >
+              Agregar Impresora
+            </Button>
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={() => openModal("equipos")}
+            >
+              Agregar Ipad
+            </Button>
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={() => openModal("equipos")}
+            >
+              Agregar UPS
             </Button>
           </Space>
           <Table

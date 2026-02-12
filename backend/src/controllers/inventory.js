@@ -53,6 +53,26 @@ WHERE estado = 'disponible';
   });
 }
 
+//obtener inventario por ID
+function getInventarioById(req, res) {
+  const { idinventario } = req.params;
+  const sql = `
+    SELECT *
+    FROM inventario
+    WHERE idinventario = ?;
+  `;
+  connection.query(sql, [idinventario], (err, results) => {
+    if (err) {
+      return res.status(500).send({ message: "Error al obtener el inventario por ID.", error: err });
+    }
+    const data = results.map(row => ({
+      ...row,
+      fecha_ingreso: moment(row.fecha_ingreso).format("YYYY-MM-DD")
+    }));
+    res.status(200).json(data);
+  });
+}
+
 //ver inventario por categorias
 function getInventarioByCategory(req, res) {
   const { id_categoria } = req.params;
@@ -530,5 +550,7 @@ module.exports = {
   getInventoryInRepairByCategory,
   getInventoryByServiceTag,
   getInventoryBySerie,
-  getInventoryByCodigoAuditoria
+  getInventoryByCodigoAuditoria,
+  getInventarioById
+
 };

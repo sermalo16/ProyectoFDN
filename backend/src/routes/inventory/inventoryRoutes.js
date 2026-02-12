@@ -8,6 +8,9 @@ const upload = require("../../middlewares/multer"); // Si estás usando multer p
 // Obtener articulos
 router.get("/get-inventory", inventoryController.getInventario);
 
+// Obtener articulo por id
+router.get("/get-inventory/:idinventario", inventoryController.getInventarioById);
+
 //ver invantario por categorias
 router.get("/get-inventory-category/:id_categoria", inventoryController.getInventarioByCategory);
 

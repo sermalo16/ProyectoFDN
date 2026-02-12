@@ -107,7 +107,7 @@ export default function InventoryPages() {
             type="text"
             icon={<EditOutlined />}
             onClick={() =>
-              navigate(`/inventario/editar/${record.idinventario}`)
+              navigate(`updateInventory/${record.idinventario}`)
             }
           />
           <Popconfirm

@@ -95,4 +95,30 @@ SELECT
       JOIN categorias c ON i.id_categoria = c.idcategoria
       WHERE a.idasignaciones IN (1)
       ORDER BY a.idasignaciones;
+      
+      
+      SELECT
+    e.idempleados,
+    e.nombre,
+    e.apellido,
+    a.idasignacion,
+    a.fecha_asignacion,
+    i.idinventario,
+    i.descripcion
+FROM inventario i
+JOIN asignacion_detalle ad         ON ad.idinventario = i.idinventario
+JOIN asignaciones a                ON a.idasignacion = ad.idasignacion
+JOIN empleados e                   ON e.idempleados = a.idempleado
+WHERE 
+    i.idinventario = 3                           -- <- ID del inventario que buscas
+    AND (a.estado IS NULL OR a.estado <> 'ANULADA')      -- opcional: según tu ENUM
+    AND (ad.estado IS NULL OR ad.estado <> 'ANULADA')    -- opcional: según tu ENUM
+    AND NOT EXISTS (
+        SELECT 1
+        FROM devoluciones_detalle dd
+        WHERE dd.id_detalle_asignacion = ad.iddetalle
+    )
+ORDER BY a.fecha_asignacion DESC
+LIMIT 1;
+
 

@@ -12,6 +12,39 @@ export const getInventoryExist = async () => {
   return await res.json();
 };
 
+
+// Obtener inventario por ID
+export const getInventoryById = async (idinventario) => {
+  try {
+    const res = await fetch(`${API_BASE}/get-inventory/${idinventario}`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    });
+
+    const result = await res.json();
+
+    if (!res.ok) {
+      throw new Error(result.message || "Error al obtener el activo");
+    }
+
+    return result;
+  } catch (error) {
+    console.error("getInventoryById error:", error);
+    throw error;
+  }
+};
+
+//obtener inventario disponible
+export const getAvailableInventory = async () => {
+  const res = await fetch(API_BASE + "/get-inventory");
+
+  if (!res.ok) {
+    const errorBody = await res.json();
+    throw new Error(errorBody.message || "Error al obtener el inventario disponible");
+  }
+  return await res.json();
+}
+
 // Obtener Inventario
 export const getInventoryByDepartment = async () => {
   const res = await fetch(API_BASE + "/get-inventory-by-deparment");
