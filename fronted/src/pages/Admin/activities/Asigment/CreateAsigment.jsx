@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   Card,
   Button,
@@ -12,231 +12,258 @@ import {
   Input,
   Modal,
   Space,
+  notification,
 } from "antd";
 import { ArrowLeftOutlined, PlusOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
+import { useAsigmentManager } from "../../../../hooks/asigment/useAsigment.js";
 
 const { Title } = Typography;
 const { Option } = Select;
 
-export default function CreateAsigment() {
+export default function CreateAssignment() {
   const navigate = useNavigate();
+  const [form] = Form.useForm();
 
-  // Estados
-  const [equipos, setEquipos] = useState([]);
-  const [accesorios, setAccesorios] = useState([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalType, setModalType] = useState(null);
+  const { inventory, employees, categories, createNewAsigment } =
+    useAsigmentManager();
+
+  /* =============================
+     STATES
+  ============================== */
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [isAssetModalOpen, setIsAssetModalOpen] = useState(false);
+  const [isAccessoryModalOpen, setIsAccessoryModalOpen] = useState(false);
+
   const [selectedItems, setSelectedItems] = useState([]);
+  const [selectedAssets, setSelectedAssets] = useState([]);
+  const [selectedAccessories, setSelectedAccessories] = useState([]);
 
-  // Datos de ejemplo
-  const empleados = ["Juan Pérez", "María López"];
-  const empresas = ["Fundidora del Norte S.A", "Tecnologia Agricola S.A"];
-  const availableEquipos = [
-    { id: 1, tipo: "Laptop", marca: "Dell", modelo: "Latitude 5480" },
-    { id: 2, tipo: "Monitor", marca: "HP", modelo: "P24v" },
-  ];
-  const availableAccesorios = [
-    { id: 1, accesorio: "Mouse", cantidad: 1 },
-    { id: 2, accesorio: "Teclado", cantidad: 1 },
-    { id: 2, accesorio: "Mochila", cantidad: 1 },
-    { id: 2, accesorio: "Teclado", cantidad: 1 },
-  ];
+  /* =============================
+     FILTRAR INVENTARIO POR CATEGORIA (ACTIVOS)
+  ============================== */
+  const filteredInventory = useMemo(() => {
+    if (!selectedCategory) return [];
+    return inventory.filter(
+      (item) => String(item.id_categoria) === String(selectedCategory)
+    );
+  }, [inventory, selectedCategory]);
 
-  // Columnas
-  const columnsEquipos = [
-    { title: "Tipo", dataIndex: "tipo", key: "tipo" },
-    { title: "Marca", dataIndex: "marca", key: "marca" },
-    { title: "Modelo", dataIndex: "modelo", key: "modelo" },
-    { title: "Codigo Auditoria", dataIndex: "codigo_auditoria", key: "codigo_auditoria" },
-    { title: "Service Tag", dataIndex: "service_tag", key: "service_tag" },
-    { title: "Valor", dataIndex: "Valor", key: "Valor" },
-    {
-      title: "Acciones",
-      key: "acciones",
-      render: (_, record) => (
-        <Button
-          type="link"
-          danger
-          onClick={() => setEquipos(equipos.filter((e) => e.id !== record.id))}
-        >
-          Eliminar
-        </Button>
-      ),
-    },
-  ];
-
-  const columnsAccesorios = [
-    { title: "Accesorio", dataIndex: "accesorio", key: "accesorio" },
-    { title: "Cantidad", dataIndex: "cantidad", key: "cantidad" },
-    { title: "Valor", dataIndex: "Valor", key: "Valor" },
-    {
-      title: "Acciones",
-      key: "acciones",
-      render: (_, record) => (
-        <Button
-          type="link"
-          danger
-          onClick={() =>
-            setAccesorios(accesorios.filter((a) => a.id !== record.id))
-          }
-        >
-          Eliminar
-        </Button>
-      ),
-    },
-  ];
-
-  // Abrir modal
-  const openModal = (type) => {
-    setModalType(type);
+  /* =============================
+     ABRIR MODAL ACTIVOS
+  ============================== */
+  const openAssetModal = (categoriaId) => {
+    setSelectedCategory(categoriaId);
     setSelectedItems([]);
-    setIsModalOpen(true);
+    setIsAssetModalOpen(true);
   };
 
-  // Confirmar selección
-  const handleAddSelected = () => {
-    if (modalType === "equipos") {
-      setEquipos([...equipos, ...selectedItems]);
-    } else {
-      setAccesorios([...accesorios, ...selectedItems]);
+  /* =============================
+     AGREGAR ACTIVOS
+  ============================== */
+  const handleAddAssets = () => {
+    const nuevos = selectedItems.filter(
+      (item) =>
+        !selectedAssets.some(
+          (asset) => asset.idinventario === item.idinventario
+        )
+    );
+
+    setSelectedAssets([...selectedAssets, ...nuevos]);
+    setIsAssetModalOpen(false);
+  };
+
+  /* =============================
+     AGREGAR ACCESORIOS
+  ============================== */
+  const handleAddAccessories = () => {
+    const nuevos = selectedItems.filter(
+      (item) =>
+        !selectedAccessories.some(
+          (acc) => acc.idinventario === item.idinventario
+        )
+    );
+
+    setSelectedAccessories([...selectedAccessories, ...nuevos]);
+    setIsAccessoryModalOpen(false);
+  };
+
+  /* =============================
+     ELIMINAR
+  ============================== */
+  const removeAsset = (id) =>
+    setSelectedAssets((prev) =>
+      prev.filter((item) => item.idinventario !== id)
+    );
+
+  const removeAccessory = (id) =>
+    setSelectedAccessories((prev) =>
+      prev.filter((item) => item.idinventario !== id)
+    );
+
+  /* =============================
+     GUARDAR
+  ============================== */
+  const onFinish = async (values) => {
+    if (selectedAssets.length === 0) {
+      notification.warning({
+        message: "Debe agregar al menos un activo",
+      });
+      return;
     }
-    setIsModalOpen(false);
+
+    try {
+      await createNewAsigment({
+        ...values,
+        equipos: selectedAssets,
+        accesorios: selectedAccessories,
+      });
+
+      form.resetFields();
+      setSelectedAssets([]);
+      setSelectedAccessories([]);
+      navigate("/admin/asigment");
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (
-    <div className="create-ticket-page">
-      {/* Encabezado */}
-      <div className="header-section">
-        <div className="left-header">
-          <Button
-            type="link"
-            icon={<ArrowLeftOutlined />}
-            className="back-button"
-            onClick={() => navigate("/admin/asigment")}
-          >
-            Volver
-          </Button>
-          <Title level={3} className="page-title">
-            Nueva Asignación
-          </Title>
-        </div>
+    <div style={{ padding: 24 }}>
+      {/* HEADER */}
+      <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+        <Button
+          type="link"
+          icon={<ArrowLeftOutlined />}
+          onClick={() => navigate("/admin/asigment")}
+        >
+          Volver
+        </Button>
+        <Title level={3} style={{ margin: 0 }}>
+          Nueva Asignación
+        </Title>
       </div>
+
       <Divider />
 
-      {/* Contenedor principal */}
-      <Card
-        style={{
-          width: "100%",
-          height: "100%",
-          display: "flex",
-          flexDirection: "column",
-          boxSizing: "border-box",
-        }}
-      >
-        <Form
-          layout="vertical"
-          style={{
-            flex: 1,
-            width: "100%",
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
-          {/* Selección empleado y empresa */}
+      <Card>
+        <Form layout="vertical" form={form} onFinish={onFinish}>
+          {/* EMPLEADO */}
           <Row gutter={16}>
             <Col span={12}>
-              <Form.Item label="Empleado" name="empleado">
+              <Form.Item
+                label="Empleado"
+                name="idempleado"
+                rules={[{ required: true }]}
+              >
                 <Select placeholder="Seleccione empleado">
-                  {empleados.map((e, idx) => (
-                    <Option key={idx}>{e}</Option>
+                  {employees.map((emp) => (
+                    <Option
+                      key={emp.idempleados}
+                      value={emp.idempleados}
+                    >
+                      {emp.nombre} {emp.apellido}
+                    </Option>
                   ))}
                 </Select>
               </Form.Item>
             </Col>
-            
           </Row>
 
-          {/* Equipos */}
-          <Divider orientation="left">Equipos a Asignar</Divider>
-          <Space style={{ marginBottom: 12 }}>
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={() => openModal("equipos")}
+          {/* ================= ACTIVOS ================= */}
+          <Divider orientation="left">Activos</Divider>
+
+          <Space style={{ marginBottom: 16 }}>
+            <Select
+              placeholder="Seleccionar categoría"
+              style={{ width: 250 }}
+              onChange={(value) => openAssetModal(value)}
             >
-              Agregar Laptop
-            </Button>
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={() => openModal("equipos")}
-            >
-              Agregar Desktop
-            </Button>
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={() => openModal("equipos")}
-            >
-              Agregar Monitor
-            </Button>
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={() => openModal("equipos")}
-            >
-              Agregar Impresora
-            </Button>
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={() => openModal("equipos")}
-            >
-              Agregar Ipad
-            </Button>
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={() => openModal("equipos")}
-            >
-              Agregar UPS
-            </Button>
+              {categories.map((category) => (
+                <Option
+                  key={category.idcategoria}
+                  value={category.idcategoria}
+                >
+                  {category.categoria}
+                </Option>
+              ))}
+            </Select>
           </Space>
+
           <Table
-            columns={columnsEquipos}
-            dataSource={equipos}
-            rowKey="id"
-            pagination={false}
             bordered
+            pagination={false}
+            rowKey="idinventario"
+            dataSource={selectedAssets}
+            columns={[
+              { title: "Código", dataIndex: "codigo_auditoria" },
+              { title: "Nombre", dataIndex: "nombre_activo" },
+              { title: "Marca", dataIndex: "marca" },
+              { title: "Modelo", dataIndex: "modelo" },
+              {
+                title: "Acciones",
+                render: (_, record) => (
+                  <Button
+                    type="link"
+                    danger
+                    onClick={() =>
+                      removeAsset(record.idinventario)
+                    }
+                  >
+                    Eliminar
+                  </Button>
+                ),
+              },
+            ]}
           />
 
-          {/* Accesorios */}
+          {/* ================= ACCESORIOS ================= */}
           <Divider orientation="left">Accesorios</Divider>
-          <Space style={{ marginBottom: 12 }}>
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={() => openModal("accesorios")}
-            >
-              Agregar accesorio
-            </Button>
-          </Space>
+
+          <Button
+            icon={<PlusOutlined />}
+            type="dashed"
+            onClick={() => {
+              setSelectedItems([]);
+              setIsAccessoryModalOpen(true);
+            }}
+            style={{ marginBottom: 16 }}
+          >
+            Agregar Accesorio
+          </Button>
+
           <Table
-            columns={columnsAccesorios}
-            dataSource={accesorios}
-            rowKey="id"
-            pagination={false}
             bordered
+            pagination={false}
+            rowKey="idinventario"
+            dataSource={selectedAccessories}
+            columns={[
+              { title: "Código", dataIndex: "codigo_auditoria" },
+              { title: "Nombre", dataIndex: "nombre_activo" },
+              { title: "Marca", dataIndex: "marca" },
+              {
+                title: "Acciones",
+                render: (_, record) => (
+                  <Button
+                    type="link"
+                    danger
+                    onClick={() =>
+                      removeAccessory(record.idinventario)
+                    }
+                  >
+                    Eliminar
+                  </Button>
+                ),
+              },
+            ]}
           />
 
-          {/* Observaciones */}
           <Divider />
+
           <Form.Item label="Observaciones" name="observaciones">
-            <Input.TextArea rows={3} placeholder="Agregar observaciones..." />
+            <Input.TextArea rows={3} />
           </Form.Item>
 
-          {/* Botones finales */}
           <Row justify="end" gutter={16}>
             <Col>
               <Button onClick={() => navigate("/admin/asigment")}>
@@ -244,49 +271,60 @@ export default function CreateAsigment() {
               </Button>
             </Col>
             <Col>
-              <Button type="primary">Guardar Asignación</Button>
+              <Button type="primary" htmlType="submit">
+                Guardar
+              </Button>
             </Col>
           </Row>
         </Form>
       </Card>
 
-      {/* Modal */}
+      {/* MODAL ACTIVOS */}
       <Modal
-        title={
-          modalType === "equipos"
-            ? "Seleccionar equipo"
-            : "Seleccionar accesorio"
-        }
-        open={isModalOpen}
-        onOk={handleAddSelected}
-        onCancel={() => setIsModalOpen(false)}
-        okText="Agregar"
-        cancelText="Cancelar"
-        width={700}
+        title="Seleccionar Activos"
+        open={isAssetModalOpen}
+        onOk={handleAddAssets}
+        onCancel={() => setIsAssetModalOpen(false)}
+        width={800}
       >
         <Table
-          columns={
-            modalType === "equipos"
-              ? [
-                  { title: "Tipo", dataIndex: "tipo" },
-                  { title: "Marca", dataIndex: "marca" },
-                  { title: "Modelo", dataIndex: "modelo" },
-                ]
-              : [
-                  { title: "Accesorio", dataIndex: "accesorio" },
-                  { title: "Cantidad", dataIndex: "cantidad" },
-                ]
-          }
-          dataSource={
-            modalType === "equipos" ? availableEquipos : availableAccesorios
-          }
-          rowKey="id"
-          pagination={false}
+          rowKey="idinventario"
+          dataSource={filteredInventory}
           rowSelection={{
             type: "checkbox",
-            selectedRowKeys: selectedItems.map((item) => item.id),
-            onChange: (_, selectedRows) => setSelectedItems(selectedRows),
+            onChange: (_, rows) => setSelectedItems(rows),
           }}
+          columns={[
+            { title: "Código", dataIndex: "codigo_auditoria" },
+            { title: "Nombre", dataIndex: "nombre_activo" },
+            { title: "Marca", dataIndex: "marca" },
+            { title: "Modelo", dataIndex: "modelo" },
+            { title: "Estado", dataIndex: "estado" },
+          ]}
+        />
+      </Modal>
+
+      {/* MODAL ACCESORIOS */}
+      <Modal
+        title="Seleccionar Accesorios"
+        open={isAccessoryModalOpen}
+        onOk={handleAddAccessories}
+        onCancel={() => setIsAccessoryModalOpen(false)}
+        width={800}
+      >
+        <Table
+          rowKey="idinventario"
+          dataSource={inventory}
+          rowSelection={{
+            type: "checkbox",
+            onChange: (_, rows) => setSelectedItems(rows),
+          }}
+          columns={[
+            { title: "Código", dataIndex: "codigo_auditoria" },
+            { title: "Nombre", dataIndex: "nombre_activo" },
+            { title: "Marca", dataIndex: "marca" },
+            { title: "Estado", dataIndex: "estado" },
+          ]}
         />
       </Modal>
     </div>

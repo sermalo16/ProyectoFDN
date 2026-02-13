@@ -1,21 +1,23 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Form, notification } from "antd";
-import { getInventoryExist } from "../../services/Inventory";
+import { getAvailableInventory } from "../../services/Inventory";
 import { getEmployees } from "../../services/employees";
 import { getAsigment, createAsigment } from "../../services/asigment";
+import { getCategories } from "../../services/categories";
 
 export const useAsigmentManager = () => {
   const [inventory, setInventory] = useState([]);
   const [loading, setLoading] = useState(false);
   const [employees, setEmployees] = useState([]);
   const [asigment, setAsigment] = useState([]);
+  const [categories, setCategories] = useState([]);
 
   // ===========================
   // 📦 Fetchers
   // ===========================
   const fetchInventory = async () => {
     try {
-      const data = await getInventoryExist();
+      const data = await getAvailableInventory();
       setInventory(data);
     } catch (err) {
       console.error("Error al cargar inventario:", err);
@@ -47,6 +49,24 @@ export const useAsigmentManager = () => {
     }
   };
 
+  /* =====================
+       FETCH CATEGORIAS
+    ===================== */
+    const fetchCategories = useCallback(async () => {
+      try {
+        const data = await getCategories();
+        console.log(data);
+        
+        setCategories(data || []);
+      } catch (err) {
+        notification.error({
+          message: "Error",
+          description:
+            err?.response?.data?.message || "Error al cargar categorías",
+        });
+      }
+    }, []);
+
   // ===========================
   // 🔁 Inicialización
   // ===========================
@@ -54,6 +74,7 @@ export const useAsigmentManager = () => {
     fetchAsigment();
     fetchInventory();
     fetchEmployees();
+    fetchCategories();
   }, []);
 
   // ===========================
@@ -103,9 +124,11 @@ export const useAsigmentManager = () => {
     employees,
     asigment,
     loading,
+    categories,
     fetchInventory,
     fetchEmployees,
     fetchAsigment,
     createNewAsigment,
+    fetchCategories
   };
 };
