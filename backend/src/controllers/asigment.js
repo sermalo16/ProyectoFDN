@@ -4,80 +4,120 @@ const {connection} = require('../database/config.db');
 const mysql = require('mysql');
 
 function getAssignments(req, res) {
-  const sql = `
+
+  const sqlAsignaciones = `
     SELECT 
-      e.idempleados, 
-      e.nombre, 
-      e.apellido, 
-      d.iddepartamentos,
-      d.departamento,
-      a.idasignaciones,
+      a.idasignacion,
       a.fecha_asignacion,
       a.observaciones,
-      a.asignado_por,
-      a.mouse,
-      a.mochila,
-      teclado,
-      ROW_NUMBER() OVER (ORDER BY e.idempleados) AS total_registros
-    FROM empleados e
-    JOIN departamentos d ON e.iddepartamento = d.iddepartamentos 
-    JOIN asignaciones a ON e.idempleados = a.idempleado 
-    ORDER BY e.idempleados
+      a.estado,
+
+      emp.idempleados AS id_empleado,
+      emp.nombre AS nombre_empleado,
+      emp.apellido AS apellido_empleado,
+
+      asignador.idempleados AS id_asignador,
+      asignador.nombre AS nombre_asignador,
+      asignador.apellido AS apellido_asignador,
+
+      d.departamento,
+      em.nombreEmpresa
+
+    FROM asignaciones a
+
+    INNER JOIN empleados emp 
+      ON a.idempleado = emp.idempleados
+
+    INNER JOIN empleados asignador 
+      ON a.asignado_por = asignador.idempleados
+
+    INNER JOIN empresa_departamento ed
+      ON emp.id_empresa_departamento = ed.id
+      
+    INNER JOIN departamentos d
+      ON d.iddepartamentos = ed.id_departamento
+      
+    INNER JOIN empresas em
+      ON em.idEmpresa = ed.id_empresa
+
+    ORDER BY a.idasignacion DESC
   `;
 
-  connection.query(sql, (err, results) => {
+  connection.query(sqlAsignaciones, (err, asignaciones) => {
+
     if (err) {
-      return res.status(500).send({ message: "Error al obtener todas las asignaciones.", error: err });
+      return res.status(500).json({
+        message: "Error al obtener asignaciones",
+        error: err
+      });
     }
 
-    const ids = results.map(row => row.idasignaciones);
-    if (ids.length === 0) return res.status(200).json([]);
+    if (asignaciones.length === 0) {
+      return res.json([]);
+    }
+
+    const ids = asignaciones.map(a => a.idasignacion);
 
     const sqlDetalles = `
       SELECT 
-        a.idasignaciones,
-        ad.id,
+        ad.iddetalle,
+        ad.idasignacion,
         ad.nuevo_usado,
+        ad.estado AS estado_detalle,
+
         i.idinventario,
         i.codigo_auditoria,
         i.service_tag,
         i.nombre_activo,
         i.marca,
         i.modelo,
-        i.valor,
-        c.categoria
-      FROM asignaciones a
-      JOIN asignaciones_detalle ad ON a.idasignaciones = ad.idasignaciones
-      JOIN inventario i ON ad.idinventario = i.idinventario
-      JOIN categorias c ON i.id_categoria = c.idcategoria
-      WHERE a.idasignaciones IN (?)
-      ORDER BY a.idasignaciones;
+        i.valor
+
+      FROM asignacion_detalle ad
+
+      INNER JOIN inventario i 
+        ON ad.idinventario = i.idinventario
+
+      WHERE ad.idasignacion IN (?)
+      ORDER BY ad.idasignacion
     `;
 
     connection.query(sqlDetalles, [ids], (err2, detalles) => {
+
       if (err2) {
-        return res.status(500).send({ message: "Error al obtener detalles de equipos.", error: err2 });
+        return res.status(500).json({
+          message: "Error al obtener detalle de asignaciones",
+          error: err2
+        });
       }
 
-      // Agrupar detalles por idasignaciones
+      // Agrupar detalles por asignación
       const detallesPorAsignacion = {};
-      detalles.forEach((item) => {
-        if (!detallesPorAsignacion[item.idasignaciones]) {
-          detallesPorAsignacion[item.idasignaciones] = [];
+
+      detalles.forEach(det => {
+
+        if (!detallesPorAsignacion[det.idasignacion]) {
+          detallesPorAsignacion[det.idasignacion] = [];
         }
-        detallesPorAsignacion[item.idasignaciones].push(item);
+
+        detallesPorAsignacion[det.idasignacion].push(det);
+
       });
 
-      // Combinar asignaciones con sus detalles
-      const data = results.map((row) => ({
-        ...row,
-        fecha_asignacion: moment(row.fecha_asignacion).format("YYYY-MM-DD"),
-        equipos: detallesPorAsignacion[row.idasignaciones] || []
+      const data = asignaciones.map(asignacion => ({
+
+        ...asignacion,
+
+        equipos: detallesPorAsignacion[asignacion.idasignacion] || []
+
       }));
 
-      res.status(200).json(data);
+      res.json(data);
+
     });
+
   });
+
 }
 
 function getUserAssignmentsById(req, res) {
@@ -123,62 +163,116 @@ function getUserAssignmentsById(req, res) {
 }
 
 function createAsigment(req, res) {
-  const { idempleado, asignado_por, Observaciones, mouse, mochila, teclado, equipos } = req.body;
+
+  const { idempleado, asignado_por, observaciones, equipos } = req.body;
+
   const fecha_asignacion = moment().format("YYYY-MM-DD HH:mm:ss");
 
-  if (!idempleado || !asignado_por || !fecha_asignacion || !equipos || equipos.length === 0) {
-    return res.status(400).send({ message: "Faltan datos o no hay activos seleccionados." });
+  if (!idempleado || !asignado_por || !equipos || equipos.length === 0) {
+    return res.status(400).json({
+      message: "Faltan datos o no hay activos seleccionados."
+    });
   }
 
-  // Insertar en la tabla asignaciones (encabezado)
-  const insertAsignacion = `
-    INSERT INTO asignaciones (idempleado, asignado_por, fecha_asignacion, observaciones, mouse, mochila, teclado)
-    VALUES (?, ?, ?, ?, ?, ?, ?)
-  `;
+  connection.beginTransaction(err => {
 
-  connection.query(insertAsignacion, [idempleado, asignado_por, fecha_asignacion, Observaciones, mouse, mochila, teclado], (err, result) => {
     if (err) {
-      console.log(err);
-      return res.status(500).send({ message: "Error al registrar la asignación.", error: err });
+      return res.status(500).json({ message: "Error iniciando transacción", error: err });
     }
 
-    const idasignacion = result.insertId; // ID de la nueva asignación
-
-    // Insertar los detalles (activos asignados con nuevo_usado)
-    const insertDetalle = `
-      INSERT INTO asignaciones_detalle (idasignaciones, idinventario, nuevo_usado)
-      VALUES ?
+    const insertAsignacion = `
+      INSERT INTO asignaciones 
+      (idempleado, asignado_por, fecha_asignacion, observaciones, estado)
+      VALUES (?, ?, ?, ?, 'ACTIVA')
     `;
 
-    const detalleValues = equipos.map(eq => [idasignacion, eq.idinventario, eq.nuevo_usado]);
+    connection.query(
+      insertAsignacion,
+      [idempleado, asignado_por, fecha_asignacion, observaciones],
+      (err, result) => {
 
-    connection.query(insertDetalle, [detalleValues], (err) => {
-      if (err) {
-                
-        return res.status(500).send({ message: "Error al registrar el detalle de asignación.", error: err });
-      }
-
-      // Actualizar estado de los activos a "ASIGNADO"
-      const updateInventario = `
-        UPDATE inventario SET estado = 'ASIGNADO'
-        WHERE idinventario IN (?)
-      `;
-
-      const idsInventario = equipos.map(eq => eq.idinventario);
-
-      connection.query(updateInventario, [idsInventario], (err) => {
         if (err) {
-          return res.status(500).send({ message: "Error al actualizar estado de inventario.", error: err });
+          return connection.rollback(() => {
+            res.status(500).json({
+              message: "Error al registrar la asignación",
+              error: err
+            });
+          });
         }
 
-        return res.status(201).send({
-          message: "Asignación creada con éxito.",
+        const idasignacion = result.insertId;
+
+        const insertDetalle = `
+          INSERT INTO asignacion_detalle
+          (idasignacion, idinventario, nuevo_usado, estado)
+          VALUES ?
+        `;
+
+        const detalleValues = equipos.map(eq => [
           idasignacion,
-          activos_asignados: equipos
+          eq.idinventario,
+          eq.nuevo_usado,
+          "ASIGNADO"
+        ]);
+
+        connection.query(insertDetalle, [detalleValues], err => {
+
+          if (err) {
+            return connection.rollback(() => {
+              res.status(500).json({
+                message: "Error al registrar detalle de asignación",
+                error: err
+              });
+            });
+          }
+
+          const idsInventario = equipos.map(eq => eq.idinventario);
+
+          const updateInventario = `
+            UPDATE inventario 
+            SET estado = 'ASIGNADO'
+            WHERE idinventario IN (?)
+          `;
+
+          connection.query(updateInventario, [idsInventario], err => {
+
+            if (err) {
+              return connection.rollback(() => {
+                res.status(500).json({
+                  message: "Error al actualizar inventario",
+                  error: err
+                });
+              });
+            }
+
+            connection.commit(err => {
+
+              if (err) {
+                return connection.rollback(() => {
+                  res.status(500).json({
+                    message: "Error al confirmar transacción",
+                    error: err
+                  });
+                });
+              }
+
+              res.status(201).json({
+                message: "Asignación creada correctamente",
+                idasignacion,
+                equipos
+              });
+
+            });
+
+          });
+
         });
-      });
-    });
+
+      }
+    );
+
   });
+
 }
 
 function deleteAsigment(req, res) {

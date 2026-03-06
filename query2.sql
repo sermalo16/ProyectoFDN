@@ -1,124 +1,38 @@
-/*inventario disponiple*/
 SELECT 
-    i.idinventario,
-    i.codigo_auditoria,
-    i.service_tag,
-    i.nombre_activo,
-    i.descripcion,
-    i.marca,
-    i.modelo,
-    i.serie,
-    i.fecha_ingreso,
-    i.valor,
-    i.estado,
-    c.idcategoria,
-    c.categoria,
-    COUNT(*) OVER () AS total_registros
-FROM inventario i
-LEFT JOIN asignaciones_detalle ad ON ad.idinventario = i.idinventario
-LEFT JOIN devoluciones d ON d.idasignaciones = ad.idasignaciones AND d.estado_activo = 'DISPONIBLE'
-JOIN categorias c ON i.id_categoria = c.idcategoria
-WHERE ad.id IS NULL OR d.iddevoluciones IS NOT NULL
-ORDER BY i.idinventario ASC;
+      a.idasignacion,
+      a.fecha_asignacion,
+      a.observaciones,
+      a.estado,
 
+      emp.idempleados AS id_empleado,
+      emp.nombre AS nombre_empleado,
+      emp.apellido AS apellido_empleado,
 
-/*no disponiple, asignado*/
-SELECT 
-    i.idinventario,
-    i.codigo_auditoria,
-    i.service_tag,
-    i.nombre_activo,
-    i.descripcion,
-    i.marca,
-    i.modelo,
-    i.serie,
-    i.fecha_ingreso,
-    i.valor,
-    c.idcategoria,
-    c.categoria,
-    d.iddepartamentos,
-    d.departamento,
-    COUNT(*) OVER () AS total_registros,
-    COUNT(*) OVER (PARTITION BY d.iddepartamentos) AS total_por_departamento
-FROM inventario i
-JOIN categorias c ON i.id_categoria = c.idcategoria
-JOIN asignaciones_detalle ad ON ad.idinventario = i.idinventario
-JOIN asignaciones a ON a.idasignaciones = ad.idasignaciones
-JOIN empleados e ON a.idempleado = e.idempleados
-JOIN departamentos d ON d.iddepartamentos = e.iddepartamento
-ORDER BY d.departamento, i.idinventario ASC;
+      asignador.idempleados AS id_asignador,
+      asignador.nombre AS nombre_asignador,
+      asignador.apellido AS apellido_asignador,
 
+      d.departamento
 
+    FROM asignaciones a
 
-/*Asignaciones*/
-SELECT 
-ROW_NUMBER() OVER (ORDER BY e.idempleados) AS numero_registro, -- enumerar registros
-e.idempleados, 
-e.nombre, 
-e.apellido, 
-d.iddepartamentos,
-d.departamento,
-a.idasignaciones,
-a.fecha_asignacion,
-a.observaciones,
-a.asignado_por,
-a.mouse,
-a.mochila
-from empleados e join departamentos d on e.iddepartamento = d.iddepartamentos 
-join asignaciones a on e.idempleados = a.idempleado 
-order by e.idempleados;
+    INNER JOIN empleados emp 
+      ON a.idempleado = emp.idempleados
 
-select ad.id, i.idinventario, i.codigo_auditoria, i.service_tag, i.nombre_activo, i.marca, i.modelo, i.valor, c.categoria from asignaciones a 
-join asignaciones_detalle ad on a.idasignaciones = ad.idasignaciones
-join inventario i on ad.idinventario = i.idinventario
-join categorias c on i.id_categoria = c.idcategoria
-where a.idasignaciones = 1 
-order by a.idasignaciones;
+    INNER JOIN empleados asignador 
+      ON a.asignado_por = asignador.idempleados
 
-/*Activos por usuarios*/
+    INNER JOIN empresa_departamento ed
+      ON emp.id_empresa_departamento = ed.id
+      
+      inner join departamentos d
+      on d.iddepartamentos = ed.id_departamento
+      
+      inner join empresas em 
+      on em.idEmpresa = ed.id_empresa
 
-SELECT 
-        a.idasignaciones,
-        ad.id,
-        ad.nuevo_usado,
-        i.idinventario,
-        i.codigo_auditoria,
-        i.service_tag,
-        i.nombre_activo,
-        i.marca,
-        i.modelo,
-        i.valor,
-        c.categoria
-      FROM asignaciones a
-      JOIN asignaciones_detalle ad ON a.idasignaciones = ad.idasignaciones
-      JOIN inventario i ON ad.idinventario = i.idinventario
-      JOIN categorias c ON i.id_categoria = c.idcategoria
-      WHERE a.idasignaciones IN (1)
-      ORDER BY a.idasignaciones;
+    ORDER BY a.idasignacion DESC
       
       
-      SELECT
-    e.idempleados,
-    e.nombre,
-    e.apellido,
-    a.idasignacion,
-    a.fecha_asignacion,
-    i.idinventario,
-    i.descripcion
-FROM inventario i
-JOIN asignacion_detalle ad         ON ad.idinventario = i.idinventario
-JOIN asignaciones a                ON a.idasignacion = ad.idasignacion
-JOIN empleados e                   ON e.idempleados = a.idempleado
-WHERE 
-    i.idinventario = 3                           -- <- ID del inventario que buscas
-    AND (a.estado IS NULL OR a.estado <> 'ANULADA')      -- opcional: según tu ENUM
-    AND (ad.estado IS NULL OR ad.estado <> 'ANULADA')    -- opcional: según tu ENUM
-    AND NOT EXISTS (
-        SELECT 1
-        FROM devoluciones_detalle dd
-        WHERE dd.id_detalle_asignacion = ad.iddetalle
-    )
-ORDER BY a.fecha_asignacion DESC
-LIMIT 1;
 
 

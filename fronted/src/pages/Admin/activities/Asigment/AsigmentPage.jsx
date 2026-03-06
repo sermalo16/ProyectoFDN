@@ -31,6 +31,10 @@ export default function AsigmentPage() {
   =============================== */
   const equipmentColumns = [
     {
+      title: "Activo",
+      dataIndex: "nombre_activo"
+    },
+    {
       title: "Modelo",
       dataIndex: "modelo"
     },
@@ -39,16 +43,8 @@ export default function AsigmentPage() {
       dataIndex: "marca"
     },
     {
-      title: "Serie",
-      dataIndex: "serie"
-    },
-    {
       title: "Service Tag",
       dataIndex: "service_tag"
-    },
-    {
-      title: "Categoría",
-      dataIndex: "categoria"
     },
     {
       title: "Condición",
@@ -66,6 +62,15 @@ export default function AsigmentPage() {
       render: (value) => `L ${value}`
     },
     {
+      title: "Estado",
+      dataIndex: "estado_detalle",
+      render: (estado) => (
+        <Tag color={estado === "Asignado" ? "blue" : "green"}>
+          {estado}
+        </Tag>
+      )
+    },
+    {
       title: "Acciones",
       fixed: "right",
       width: 150,
@@ -73,7 +78,6 @@ export default function AsigmentPage() {
         <Button
           type="text"
           icon={<EditOutlined />}
-          onClick={() => navigate("createAsigment")}
         >
           Devolver
         </Button>
@@ -82,32 +86,30 @@ export default function AsigmentPage() {
   ];
 
   /* ===============================
-     COMPONENTE ACORDEÓN REUTILIZABLE
+     COMPONENTE ACORDEÓN
   =============================== */
   const AssignmentAccordion = ({ data }) => (
     <Collapse accordion>
       {data.map((item) => (
         <Panel
-          key={item.idasignaciones}
-          header={`${item.nombre} ${item.apellido} - ${item.departamento}`}
+          key={item.idasignacion}
+          header={`#${item.idasignacion} ${item.nombre_empleado} ${item.apellido_empleado} - ${item.departamento}`}
           extra={
-            <Tag color="blue">
-              {item.fecha_asignacion}
+            <Tag color={item.estado === "Activa" ? "blue" : "green"}>
+              {new Date(item.fecha_asignacion).toLocaleDateString()}
             </Tag>
           }
         >
           <Row gutter={[16, 8]}>
-            <Col span={8}>
-              <strong>Asignado por:</strong> {item.asignado_por}
+            <Col span={12}>
+              <strong>Asignado por:</strong>{" "}
+              {item.nombre_asignador} {item.apellido_asignador}
             </Col>
-            <Col span={8}>
-              <strong>Mochila:</strong>{" "}
-              {item.mochila === 1 ? "Entregado" : "No entregado"}
+
+            <Col span={12}>
+              <strong>Empresa:</strong> {item.nombreEmpresa}
             </Col>
-            <Col span={8}>
-              <strong>Mouse:</strong>{" "}
-              {item.mouse === 1 ? "Entregado" : "No entregado"}
-            </Col>
+
             <Col span={24}>
               <strong>Observaciones:</strong>{" "}
               {item.observaciones || "Sin observaciones"}
@@ -138,64 +140,57 @@ export default function AsigmentPage() {
 ================================= */
 const mockAssignments = [
   {
-    idasignaciones: 1,
-    nombre: "Carlos",
-    apellido: "Mejía",
+    idasignacion: 1,
+    nombre_empleado: "Carlos",
+    apellido_empleado: "Mejía",
     departamento: "Soporte Técnico",
     fecha_asignacion: "2026-02-20",
-    asignado_por: "Sergio Admin",
+    nombre_asignador: "Sergio",
+    apellido_asignador: "Admin",
+    nombreEmpresa: "Grupo Funo",
     observaciones: "Equipo entregado en excelente estado.",
-    mochila: 1,
-    mouse: 1,
+    estado: "Activa",
     equipos: [
       {
         idinventario: 101,
+        nombre_activo: "Laptop Carlos",
         modelo: "Latitude 5480",
         marca: "Dell",
-        serie: "SN123456",
         service_tag: "ST-4587",
-        categoria: "Laptop",
         nuevo_usado: 1,
+        estado_detalle: "Asignado",
         valor: 18500
-      },
-      {
-        idinventario: 102,
-        modelo: "ThinkVision T24",
-        marca: "Lenovo",
-        serie: "MN789456",
-        service_tag: "ST-9988",
-        categoria: "Monitor",
-        nuevo_usado: 0,
-        valor: 5200
       }
     ]
   }
 ];
 
-
-/* ===============================
-    FUNCIONES DE BUSQUEDA Y FILTRADO
+  /* ===============================
+    BUSQUEDA
   =============================== */
 
   const dataSource = asigment.length > 0 ? asigment : mockAssignments;
 
-const filteredAssignments = useMemo(() => {
-  if (!search.trim()) return dataSource;
+  const filteredAssignments = useMemo(() => {
+    if (!search.trim()) return dataSource;
 
-  const lower = search.toLowerCase();
+    const lower = search.toLowerCase();
 
-  return dataSource.filter((item) => {
-    return (
-      item.idasignaciones?.toString().includes(lower) ||
-      item.nombre?.toLowerCase().includes(lower) ||
-      item.apellido?.toLowerCase().includes(lower)
-    );
-  });
-}, [search, dataSource]);
+    return dataSource.filter((item) => {
+      return (
+        item.idasignacion?.toString().includes(lower) ||
+        item.nombre_empleado?.toLowerCase().includes(lower) ||
+        item.apellido_empleado?.toLowerCase().includes(lower)
+      );
+    });
+  }, [search, dataSource]);
+
+  
 
   /* ===============================
      UI PRINCIPAL
   =============================== */
+
  return (
   <div>
     {/* HEADER */}
@@ -246,10 +241,10 @@ const filteredAssignments = useMemo(() => {
         </Tabs.TabPane>
 
         <Tabs.TabPane tab="Devoluciones" key="2">
-          <AssignmentAccordion data={filteredAssignments} />
+          <AssignmentAccordion data={mockAssignments} />
         </Tabs.TabPane>
       </Tabs>
     </Card>
   </div>
-);
+ );
 }
