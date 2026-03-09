@@ -164,7 +164,8 @@ function getUserAssignmentsById(req, res) {
 
 function createAsigment(req, res) {
 
-  const { idempleado, asignado_por, observaciones, equipos } = req.body;
+  const { idempleado, observaciones, equipos } = req.body;
+  const asignado_por = req.user.id;
 
   const fecha_asignacion = moment().format("YYYY-MM-DD HH:mm:ss");
 

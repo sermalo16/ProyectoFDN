@@ -5,6 +5,7 @@ import { getEmployees } from "../../services/employees";
 import { getAsigment, createAsigment } from "../../services/asigment";
 import { getCategories } from "../../services/categories";
 
+
 export const useAsigmentManager = () => {
   const [inventory, setInventory] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -84,11 +85,7 @@ export const useAsigmentManager = () => {
     try {
       const payload = {
         idempleado: values.idempleado,
-        asignado_por: "Sergio Morel", // puedes reemplazarlo con usuario logueado
         Observaciones: values.observaciones || "",
-        mouse: values.mouse ? 1 : 0,
-        mochila: values.mochila ? 1 : 0,
-        teclado: values.teclado ? 1 : 0,
         equipos: values.equipos.map((eq) => ({
           idinventario: eq.idinventario,
           nuevo_usado: eq.nuevo_usado,

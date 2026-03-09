@@ -1,4 +1,5 @@
 const API_BASE = "http://localhost:3308/api/v1/asigment/";
+import {getAccessTokenApi} from "../services/auth.js";
 
 // Obtener Inventario
 export const getAsigment = async () => {
@@ -17,7 +18,10 @@ export const createAsigment = async (data) => {
   try {
     const res = await fetch(API_BASE + "/post-asigment", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { 
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${getAccessTokenApi()}`
+      },
       body: JSON.stringify(data),
     });
 
